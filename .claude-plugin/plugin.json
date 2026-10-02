@@ -1,7 +1,7 @@
 {
   "name": "cindova-security",
   "displayName": "Cindova Security Skills",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Framework-aware security skills for AI coding agents: evidence-based security review, secure-coding guardrails and fix verification.",
   "author": {
     "name": "Cindova Technologies",
@@ -17,7 +17,9 @@
     "owasp",
     "laravel",
     "secure-coding",
-    "vulnerability"
+    "vulnerability",
+    "wordpress",
+    "woocommerce"
   ],
   "icon": "./assets/icon.png",
   "documentationUrl": "https://github.com/cindovahq/security-skills#readme",

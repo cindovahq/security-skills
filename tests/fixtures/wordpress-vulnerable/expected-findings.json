@@ -1,0 +1,516 @@
+{
+  "fixture": "wordpress-vulnerable",
+  "skill": "wordpress-security",
+  "description": "Ground truth for evaluating a security review of the Acme Toolkit plugin and wp-config.php. 'findings' must be reported; 'traps' are safe patterns that must NOT be reported as vulnerabilities.",
+  "findings": [
+    {
+      "id": "W01",
+      "title": "Unauthenticated arbitrary option update via admin_init (e.g. users_can_register + default_role=administrator)",
+      "severity": [
+        "critical"
+      ],
+      "files": [
+        "admin.php"
+      ],
+      "keywords": [
+        "admin_init",
+        "update_option",
+        "option",
+        "privilege escalation"
+      ]
+    },
+    {
+      "id": "W02",
+      "title": "Unauthenticated SQL injection in acme_lookup (wp_ajax_nopriv)",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "ajax.php"
+      ],
+      "keywords": [
+        "acme_lookup",
+        "sql injection",
+        "sqli",
+        "email"
+      ]
+    },
+    {
+      "id": "W03",
+      "title": "Any logged-in user can delete any entry (nonce only, no capability/ownership; nonce exposed to all logged-in users)",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "ajax.php",
+        "frontend.php"
+      ],
+      "keywords": [
+        "acme_delete_entry",
+        "delete",
+        "capability",
+        "ownership"
+      ]
+    },
+    {
+      "id": "W04",
+      "title": "Public REST route /acme/v1/entries exposes all entries with emails and messages",
+      "severity": [
+        "high",
+        "critical"
+      ],
+      "files": [
+        "rest.php"
+      ],
+      "keywords": [
+        "/entries",
+        "entries",
+        "__return_true",
+        "permission_callback"
+      ]
+    },
+    {
+      "id": "W05",
+      "title": "Contributor stored XSS via acme_button shortcode url/label",
+      "severity": [
+        "medium",
+        "high"
+      ],
+      "files": [
+        "frontend.php"
+      ],
+      "keywords": [
+        "acme_button",
+        "shortcode",
+        "xss"
+      ]
+    },
+    {
+      "id": "W06",
+      "title": "Reflected XSS via $_GET['tab'] on the settings page",
+      "severity": [
+        "medium",
+        "low"
+      ],
+      "files": [
+        "admin.php"
+      ],
+      "keywords": [
+        "tab",
+        "reflected",
+        "xss"
+      ]
+    },
+    {
+      "id": "W07",
+      "title": "Unauthenticated arbitrary file upload (client filename into plugin uploads dir) -> RCE",
+      "severity": [
+        "critical"
+      ],
+      "files": [
+        "ajax.php"
+      ],
+      "keywords": [
+        "acme_upload",
+        "move_uploaded_file",
+        "upload",
+        "rce"
+      ]
+    },
+    {
+      "id": "W08",
+      "title": "Path traversal in acme_download reads arbitrary files (e.g. wp-config.php) for any logged-in user",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "ajax.php"
+      ],
+      "keywords": [
+        "acme_download",
+        "traversal",
+        "readfile",
+        "wp-config"
+      ]
+    },
+    {
+      "id": "W09",
+      "title": "Unauthenticated PHP object injection via maybe_unserialize on acme_prefs cookie",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "frontend.php"
+      ],
+      "keywords": [
+        "acme_prefs",
+        "unserialize",
+        "object injection"
+      ]
+    },
+    {
+      "id": "W10",
+      "title": "SSRF in acme_fetch_preview (wp_remote_get on user URL, body returned)",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "ajax.php"
+      ],
+      "keywords": [
+        "acme_fetch_preview",
+        "ssrf",
+        "wp_remote_get",
+        "wp_safe_remote_get"
+      ]
+    },
+    {
+      "id": "W11",
+      "title": "Open redirect via redirect_to with wp_redirect",
+      "severity": [
+        "low",
+        "medium"
+      ],
+      "files": [
+        "frontend.php"
+      ],
+      "keywords": [
+        "redirect_to",
+        "open redirect",
+        "wp_safe_redirect"
+      ]
+    },
+    {
+      "id": "W12",
+      "title": "Magic-login authentication bypass: loose comparison with empty stored token logs in any user by uid",
+      "severity": [
+        "critical"
+      ],
+      "files": [
+        "frontend.php"
+      ],
+      "keywords": [
+        "acme_login",
+        "token",
+        "auth",
+        "bypass",
+        "empty"
+      ]
+    },
+    {
+      "id": "W13",
+      "title": "SQL injection via ORDER BY in acme_list_entries (sanitize_text_field is not SQL escaping)",
+      "severity": [
+        "critical",
+        "high",
+        "medium"
+      ],
+      "files": [
+        "ajax.php"
+      ],
+      "keywords": [
+        "orderby",
+        "order by",
+        "acme_list_entries"
+      ]
+    },
+    {
+      "id": "W14",
+      "title": "Direct-access export.php loads WordPress and dumps all entries without authentication",
+      "severity": [
+        "high",
+        "critical"
+      ],
+      "files": [
+        "export.php"
+      ],
+      "keywords": [
+        "export.php",
+        "wp-load",
+        "direct",
+        "csv"
+      ]
+    },
+    {
+      "id": "W15",
+      "title": "WooCommerce order IDOR: acme_order_status returns any order's addresses",
+      "severity": [
+        "high"
+      ],
+      "files": [
+        "woocommerce.php"
+      ],
+      "keywords": [
+        "acme_order_status",
+        "order",
+        "idor",
+        "view_order"
+      ]
+    },
+    {
+      "id": "W16",
+      "title": "WooCommerce price tampering via acme_custom_price cart item data",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "woocommerce.php"
+      ],
+      "keywords": [
+        "acme_custom_price",
+        "set_price",
+        "price"
+      ]
+    },
+    {
+      "id": "W17",
+      "title": "Unsigned payment callback marks any order paid",
+      "severity": [
+        "critical"
+      ],
+      "files": [
+        "woocommerce.php"
+      ],
+      "keywords": [
+        "acme_gateway",
+        "payment_complete",
+        "signature",
+        "callback"
+      ]
+    },
+    {
+      "id": "W18",
+      "title": "Placeholder authentication keys and salts in wp-config.php (WordPress falls back to DB-stored random salts, so Low/Hardening)",
+      "severity": [
+        "low",
+        "hardening",
+        "medium"
+      ],
+      "files": [
+        "wp-config.php"
+      ],
+      "keywords": [
+        "put your unique phrase here",
+        "salt",
+        "auth_key"
+      ]
+    },
+    {
+      "id": "W19",
+      "title": "Debug display and public debug.log enabled in production",
+      "severity": [
+        "medium",
+        "high"
+      ],
+      "files": [
+        "wp-config.php"
+      ],
+      "keywords": [
+        "WP_DEBUG_LOG",
+        "WP_DEBUG_DISPLAY",
+        "debug.log"
+      ]
+    },
+    {
+      "id": "W20",
+      "title": "Abilities API ability acme/purge-entries has __return_true permission_callback (destructive)",
+      "severity": [
+        "high",
+        "medium",
+        "critical"
+      ],
+      "files": [
+        "rest.php"
+      ],
+      "keywords": [
+        "purge",
+        "ability",
+        "abilities",
+        "wp_register_ability"
+      ]
+    },
+    {
+      "id": "W21",
+      "title": "Hardcoded API secret in plugin source",
+      "severity": [
+        "medium",
+        "low"
+      ],
+      "files": [
+        "acme-toolkit.php"
+      ],
+      "keywords": [
+        "ACME_API_SECRET",
+        "secret",
+        "hardcoded"
+      ]
+    }
+  ],
+  "optional": [
+    {
+      "id": "WO1",
+      "title": "DISALLOW_FILE_EDIT not set",
+      "files": [
+        "wp-config.php"
+      ],
+      "keywords": [
+        "DISALLOW_FILE_EDIT"
+      ]
+    },
+    {
+      "id": "WO2",
+      "title": "Missing ABSPATH guard / no PHP execution block for plugin uploads dir",
+      "files": [
+        "export.php",
+        "acme-toolkit.php"
+      ],
+      "keywords": [
+        "ABSPATH",
+        "uploads"
+      ]
+    },
+    {
+      "id": "WO3",
+      "title": "Public acme_lookup reveals whether an email submitted a form (enumeration)",
+      "files": [
+        "ajax.php"
+      ],
+      "keywords": [
+        "enumerat"
+      ]
+    }
+  ],
+  "traps": [
+    {
+      "id": "WT01",
+      "title": "Settings page entries query uses prepare with %d",
+      "files": [
+        "admin.php"
+      ],
+      "keywords": [
+        "acme_render_settings_page"
+      ]
+    },
+    {
+      "id": "WT02",
+      "title": "Entry names/emails escaped with esc_html on the settings page",
+      "files": [
+        "admin.php"
+      ],
+      "keywords": [
+        "esc_html( $entry"
+      ]
+    },
+    {
+      "id": "WT03",
+      "title": "acme_export_settings has nonce + manage_options check",
+      "files": [
+        "admin.php"
+      ],
+      "keywords": [
+        "acme_export_settings"
+      ]
+    },
+    {
+      "id": "WT04",
+      "title": "acme_save_profile writes only the current user's allow-listed meta with a nonce",
+      "files": [
+        "ajax.php"
+      ],
+      "keywords": [
+        "acme_save_profile",
+        "acme_layout"
+      ]
+    },
+    {
+      "id": "WT05",
+      "title": "acme_check_version uses a constant URL and update_plugins capability (not SSRF)",
+      "files": [
+        "ajax.php"
+      ],
+      "keywords": [
+        "acme_check_version",
+        "api.acme.example"
+      ]
+    },
+    {
+      "id": "WT06",
+      "title": "Public /acme/v1/status route returns only {ok:true}",
+      "files": [
+        "rest.php"
+      ],
+      "keywords": [
+        "/status"
+      ]
+    },
+    {
+      "id": "WT07",
+      "title": "REST entries pagination uses prepare %d for OFFSET (the issue is the permission, not SQLi)",
+      "files": [
+        "rest.php"
+      ],
+      "keywords": [
+        "offset",
+        "sql injection"
+      ]
+    },
+    {
+      "id": "WT08",
+      "title": "acme_announcement output passes through wp_kses_post",
+      "files": [
+        "frontend.php"
+      ],
+      "keywords": [
+        "acme_announcement"
+      ]
+    },
+    {
+      "id": "WT09",
+      "title": "maybe_unserialize on admin-only acme_cache option",
+      "files": [
+        "frontend.php"
+      ],
+      "keywords": [
+        "acme_cache",
+        "acme_get_cache"
+      ]
+    },
+    {
+      "id": "WT10",
+      "title": "$table_prefix = 'wp_' is not a vulnerability",
+      "files": [
+        "wp-config.php"
+      ],
+      "keywords": [
+        "table_prefix"
+      ]
+    },
+    {
+      "id": "WT11",
+      "title": "DB credentials come from environment variables",
+      "files": [
+        "wp-config.php"
+      ],
+      "keywords": [
+        "DB_PASSWORD",
+        "getenv"
+      ]
+    },
+    {
+      "id": "WT12",
+      "title": "Shortcode style attribute is escaped with esc_attr (url/label are the issue)",
+      "files": [
+        "frontend.php"
+      ],
+      "keywords": [
+        "style"
+      ]
+    }
+  ]
+}

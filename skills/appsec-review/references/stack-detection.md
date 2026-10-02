@@ -47,7 +47,7 @@ Use a framework skill when it's installed. Otherwise fall back to this skill's b
 | Detected | Skill | Status |
 |---|---|---|
 | Laravel | `laravel-security` | available |
-| WordPress / WooCommerce | `wordpress-security` | planned |
+| WordPress / WooCommerce | `wordpress-security` | available |
 | Next.js (+ Supabase) | `nextjs-security`, `supabase-security` | planned |
 | Node.js / Express | `nodejs-security` | planned |
 | NestJS | `nestjs-security` | planned |

@@ -28,9 +28,10 @@ They give Claude Code, GitHub Copilot (VS Code), Kiro, Cursor, Codex, Google Ant
 | Skill | Use it for | Status |
 |---|---|---|
 | [`appsec-review`](skills/appsec-review/SKILL.md) | Security reviews of any codebase, PR or diff. Detects the stack, routes to framework skills, and falls back to built-in checklists for auth, access control, injection, XSS/CSRF/CORS, SSRF, uploads, secrets, crypto, APIs, supply chain/CI, business logic and **LLM/AI features**. | beta |
+| [`wordpress-security`](skills/wordpress-security/SKILL.md) | WordPress 6.x–7.x plugins, themes and sites, plus **WooCommerce**: capability checks, nonces, `$wpdb->prepare`, escaping, AJAX/REST/admin-post handlers, the Abilities API, object injection, uploads and file operations, SSRF/redirects, `wp-config.php`, order IDOR, price tampering and payment callbacks. | beta |
 | [`laravel-security`](skills/laravel-security/SKILL.md) | Laravel 10–13: authentication, authorization/IDOR, sessions, CSRF (incl. Laravel 13 `PreventRequestForgery`), validation and mass assignment, SQL/command/deserialization injection, XSS, SSRF, uploads, secrets/debug exposure, Sanctum/Passport APIs, Livewire/Filament, dependencies, and fix verification. | beta |
 
-More frameworks are on the way: WordPress, Next.js + Supabase, Node.js/Express, NestJS, React, Django, Spring Boot, ASP.NET Core, Flutter. See the [roadmap](docs/ROADMAP.md).
+More frameworks are on the way: Next.js + Supabase, Node.js/Express, NestJS, React, Django, Spring Boot, ASP.NET Core, Flutter. See the [roadmap](docs/ROADMAP.md).
 
 ## Install
 

@@ -4,6 +4,16 @@ All notable changes to this project are documented here. The format is based on 
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-02
+
+### Added
+- `wordpress-security` skill for WordPress 6.x–7.x and WooCommerce 8.x–11.x: authorization and capabilities, nonces/CSRF, SQL injection, XSS and escaping, input handling and object injection, file uploads, REST/AJAX/Abilities API exposure, SSRF and redirects, authentication, configuration and secrets, WooCommerce, dependencies (including the 2026 core security releases), and verification.
+- Deliberately vulnerable WordPress plugin fixture with an answer key (`tests/fixtures/wordpress-vulnerable`).
+
+### Changed
+- `laravel-security`: added a severity-calibration section (`orderBy` oracle, Livewire IDOR, mass-assignment chains).
+- Validator now rejects unquoted frontmatter values containing `: ` (invalid YAML that strict agents fail to parse).
+
 ## [1.0.0] - 2026-10-02
 
 ### Added

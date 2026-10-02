@@ -7,6 +7,7 @@
 | Fixture | Skill | Planted findings | Traps |
 |---|---|---|---|
 | `fixtures/laravel-vulnerable` | `laravel-security` (+ `appsec-review`) | 21 (+4 optional) | 12 |
+| `fixtures/wordpress-vulnerable` | `wordpress-security` (+ `appsec-review`) | 21 (+3 optional) | 12 |
 
 Each fixture contains a minimal, realistic app skeleton and `expected-findings.json`:
 
@@ -47,6 +48,8 @@ Record results here when skills change, so regressions are visible.
 | Date | Skill version | Agent / model | Recall | Trap hits (confirmed) | Notes |
 |---|---|---|---|---|---|
 | 2026-10-02 | laravel-security 1.0.0, appsec-review 1.0.0 | Claude Code 2.1.287 (Opus 5.5), headless, read-only tools | 21/21 | 0/12 | 19/21 within expected severity. L17 (orderBy oracle) rated Low and L06 (Livewire IDOR) rated Medium; a "Severity calibration" section was added to `laravel-security` afterwards. Found an unplanted issue (unpublished posts readable by ID), now O04. Correctly listed 5 traps as safe patterns and explained the reduced CORS impact. |
+| 2026-10-02 | laravel-security 1.1.0, appsec-review 1.0.0 | Claude Code 2.1.287 (Sonnet 5.5), headless, read-only tools | 21/21 | 0/12 | All severities within range after the calibration update (orderBy oracle and Livewire IDOR now High). One scorer trap flag (T08) was a false alarm: the finding was about unthrottled *registration* and explicitly noted login is throttled. |
+| 2026-10-02 | wordpress-security 1.0.0, appsec-review 1.0.0 | Claude Code 2.1.287 (Opus 5.5), headless, read-only tools | 21/21 | 0/12 | Rated placeholder salts Low. Verified correct against `wp_salt()` (WordPress falls back to DB-stored random salts), so the skill and answer key were corrected. Also found CSV formula injection in the export (valid, unplanted). |
 
 ## Adding a fixture
 

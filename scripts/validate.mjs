@@ -67,6 +67,9 @@ function parseFrontmatter(text, file) {
         err(file, `frontmatter line ${i + 2}: nested values must be single-line strings`);
         continue;
       }
+      if (!/^["']/.test(nested[2].trim()) && /: |\s#/.test(nested[2])) {
+        err(file, `frontmatter line ${i + 2}: unquoted value contains ": " or " #", which is invalid YAML`);
+      }
       currentMap[nested[1]] = unquote(nested[2]);
     } else if (top) {
       const [, key, value] = top;
@@ -76,6 +79,9 @@ function parseFrontmatter(text, file) {
       } else if (/^[>|]/.test(value)) {
         err(file, `frontmatter line ${i + 2}: use single-line values (block scalars are not portable across agents)`);
       } else {
+        if (!/^["']/.test(value.trim()) && /: |\s#/.test(value)) {
+          err(file, `frontmatter line ${i + 2}: unquoted "${key}" contains ": " or " #", which is invalid YAML; rephrase or quote it`);
+        }
         data[key] = unquote(value);
         currentMap = null;
       }

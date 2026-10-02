@@ -5,7 +5,7 @@ license: Apache-2.0
 metadata:
   author: Cindova Technologies
   homepage: https://github.com/cindovahq/security-skills
-  version: "1.0.0"
+  version: "1.1.0"
   status: beta
   framework-versions: "Laravel 10.x, 11.x, 12.x, 13.x"
   last-verified: "2026-10-02"

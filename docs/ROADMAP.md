@@ -8,6 +8,7 @@ Priorities are based on how widely each stack is used with AI coding agents and 
 |---|---|
 | `appsec-review` (methodology, stack routing, generic checklists incl. LLM/agent security) | 1.0.0 |
 | `laravel-security` (Laravel 10–13) | 1.0.0 |
+| `wordpress-security` (WordPress 6.x–7.x, WooCommerce) | 1.0.0 |
 
 ## Next: framework skills
 
@@ -15,16 +16,15 @@ Each one follows the `laravel-security` template: a short `SKILL.md` workflow, r
 
 | Order | Skill | Notes |
 |---|---|---|
-| 1 | `wordpress-security` | Plugins/themes: nonces, capabilities, `$wpdb->prepare`, escaping functions, REST `permission_callback`, AJAX actions, uploads. Includes WooCommerce. |
-| 2 | `nextjs-security` | App Router, Server Actions, Route Handlers, middleware limits, `NEXT_PUBLIC_` leaks, caching of personalized data |
-| 3 | `supabase-security` | RLS policies, `service_role` exposure, storage policies, Edge Functions, `SECURITY DEFINER` functions |
-| 4 | `nodejs-security` | Express/Fastify/Hono middleware, prototype pollution, `child_process`, path handling, JWT libraries |
-| 5 | `nestjs-security` | Guards, global pipes/`ValidationPipe` (`whitelist`, `forbidNonWhitelisted`), Passport strategies, WebSocket gateways |
-| 6 | `react-security` | Raw-HTML sinks, URL handling, token storage, SSR data leaks, dependency risk |
-| 7 | `django-security` | `settings.py` hardening, ORM raw SQL, DRF permissions and serializers, templates, CSRF |
-| 8 | `spring-boot-security` | `SecurityFilterChain`, method security, Actuator, SpEL, deserialization, JPA queries |
-| 9 | `aspnet-core-security` | Authorization policies, antiforgery, EF Core raw SQL, Data Protection, model binding |
-| 10 | `flutter-security` | Secure storage, certificate pinning, deep links, WebViews, secrets in binaries, platform channels |
+| 1 | `nextjs-security` | App Router, Server Actions, Route Handlers, middleware limits, `NEXT_PUBLIC_` leaks, caching of personalized data |
+| 2 | `supabase-security` | RLS policies, `service_role` exposure, storage policies, Edge Functions, `SECURITY DEFINER` functions |
+| 3 | `nodejs-security` | Express/Fastify/Hono middleware, prototype pollution, `child_process`, path handling, JWT libraries |
+| 4 | `nestjs-security` | Guards, global pipes/`ValidationPipe` (`whitelist`, `forbidNonWhitelisted`), Passport strategies, WebSocket gateways |
+| 5 | `react-security` | Raw-HTML sinks, URL handling, token storage, SSR data leaks, dependency risk |
+| 6 | `django-security` | `settings.py` hardening, ORM raw SQL, DRF permissions and serializers, templates, CSRF |
+| 7 | `spring-boot-security` | `SecurityFilterChain`, method security, Actuator, SpEL, deserialization, JPA queries |
+| 8 | `aspnet-core-security` | Authorization policies, antiforgery, EF Core raw SQL, Data Protection, model binding |
+| 9 | `flutter-security` | Secure storage, certificate pinning, deep links, WebViews, secrets in binaries, platform channels |
 
 ## Later
 
