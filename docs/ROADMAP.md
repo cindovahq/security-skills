@@ -37,7 +37,7 @@ Each one follows the `laravel-security` template: a short `SKILL.md` workflow, r
 
 ## Tooling
 
-- Vulnerable fixture and answer key for `nodejs-security` (the skill ships without one in 1.2.0).
+- Vulnerable fixture and answer key for `nodejs-security` (the skill ships without one in 1.2.0). Parked, see [PENDING.md](PENDING.md) P-001.
 - Automated eval runner: run each fixture through supported agents in CI and track recall and false-positive rate per release.
 - SARIF output helper for GitHub code scanning.
 - More fixtures per framework, including "secure twin" fixtures where no finding should be reported.

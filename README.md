@@ -23,6 +23,10 @@ They give Claude Code, GitHub Copilot (VS Code), Kiro, Cursor, Codex, Google Ant
 - **Two modes.** *Review mode* audits code, PRs or diffs. *Build mode* applies secure defaults while the agent writes code.
 - **Open standard.** Plain `SKILL.md` files in the [Agent Skills](https://agentskills.io) format work in any compatible agent, installed per project or globally.
 
+> [!WARNING]
+> **AI can make mistakes. Review every finding and fix before you act on it.**
+> These skills guide AI agents, and AI output can be wrong or incomplete. A review may miss real vulnerabilities, report issues that aren't exploitable, misjudge severity, or suggest a fix that breaks behavior or introduces a new bug. The skills themselves were written with AI assistance and checked against official documentation, but framework guidance changes over time. Treat results as a starting point for a qualified human reviewer, test every fix before deploying it, and don't rely on these skills as your only security control. They're provided "as is", without warranty, under the [Apache License 2.0](LICENSE).
+
 ## Skills
 
 | Skill | Use it for | Status |
