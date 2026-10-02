@@ -9,6 +9,9 @@ Priorities are based on how widely each stack is used with AI coding agents and 
 | `appsec-review` (methodology, stack routing, generic checklists incl. LLM/agent security) | 1.0.0 |
 | `laravel-security` (Laravel 10–13) | 1.0.0 |
 | `wordpress-security` (WordPress 6.x–7.x, WooCommerce) | 1.0.0 |
+| `nextjs-security` (Next.js 14–16) | 1.0.0 |
+| `supabase-security` | 1.0.0 |
+| `nodejs-security` (Express, Fastify, Koa, Hono) | 1.0.0 |
 
 ## Next: framework skills
 
@@ -16,15 +19,12 @@ Each one follows the `laravel-security` template: a short `SKILL.md` workflow, r
 
 | Order | Skill | Notes |
 |---|---|---|
-| 1 | `nextjs-security` | App Router, Server Actions, Route Handlers, middleware limits, `NEXT_PUBLIC_` leaks, caching of personalized data |
-| 2 | `supabase-security` | RLS policies, `service_role` exposure, storage policies, Edge Functions, `SECURITY DEFINER` functions |
-| 3 | `nodejs-security` | Express/Fastify/Hono middleware, prototype pollution, `child_process`, path handling, JWT libraries |
-| 4 | `nestjs-security` | Guards, global pipes/`ValidationPipe` (`whitelist`, `forbidNonWhitelisted`), Passport strategies, WebSocket gateways |
-| 5 | `react-security` | Raw-HTML sinks, URL handling, token storage, SSR data leaks, dependency risk |
-| 6 | `django-security` | `settings.py` hardening, ORM raw SQL, DRF permissions and serializers, templates, CSRF |
-| 7 | `spring-boot-security` | `SecurityFilterChain`, method security, Actuator, SpEL, deserialization, JPA queries |
-| 8 | `aspnet-core-security` | Authorization policies, antiforgery, EF Core raw SQL, Data Protection, model binding |
-| 9 | `flutter-security` | Secure storage, certificate pinning, deep links, WebViews, secrets in binaries, platform channels |
+| 1 | `nestjs-security` | Guards, global pipes/`ValidationPipe` (`whitelist`, `forbidNonWhitelisted`), Passport strategies, WebSocket gateways |
+| 2 | `react-security` | Raw-HTML sinks, URL handling, token storage, SSR data leaks, dependency risk |
+| 3 | `django-security` | `settings.py` hardening, ORM raw SQL, DRF permissions and serializers, templates, CSRF |
+| 4 | `spring-boot-security` | `SecurityFilterChain`, method security, Actuator, SpEL, deserialization, JPA queries |
+| 5 | `aspnet-core-security` | Authorization policies, antiforgery, EF Core raw SQL, Data Protection, model binding |
+| 6 | `flutter-security` | Secure storage, certificate pinning, deep links, WebViews, secrets in binaries, platform channels |
 
 ## Later
 
@@ -37,6 +37,7 @@ Each one follows the `laravel-security` template: a short `SKILL.md` workflow, r
 
 ## Tooling
 
+- Vulnerable fixture and answer key for `nodejs-security` (the skill ships without one in 1.2.0).
 - Automated eval runner: run each fixture through supported agents in CI and track recall and false-positive rate per release.
 - SARIF output helper for GitHub code scanning.
 - More fixtures per framework, including "secure twin" fixtures where no finding should be reported.

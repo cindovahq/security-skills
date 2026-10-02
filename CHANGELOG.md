@@ -4,6 +4,17 @@ All notable changes to this project are documented here. The format is based on 
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-10-02
+
+### Added
+- `nextjs-security` skill (Next.js 14–16): Server Actions, Route Handlers, proxy/middleware limits, RSC advisories, data exposure to Client Components, secrets, caching, XSS, SSRF and image optimization, auth libraries, security headers/CSP, dependencies, verification. Includes a vulnerable App Router fixture.
+- `supabase-security` skill: API keys, Data API exposure and grants, RLS policies, multi-tenancy, functions/views/triggers, Storage, Auth configuration, SSR clients, Edge Functions, Realtime, webhooks/cron/Vault, verification. Includes a vulnerable Supabase project fixture.
+- `nodejs-security` skill (Express 4/5, Fastify, Koa, Hono): authentication, authorization, sessions and cookies, CSRF/CORS, input validation, injection, XSS in templates, SSRF and redirects, files and paths, secrets and config, API security, framework specifics, dependencies, verification. A fixture for this skill is not included yet.
+- `scripts/run-eval.mjs`: blinded, one-command evaluations with Claude Code on a chosen model.
+
+### Changed
+- Fixtures keep their "deliberately insecure" notice only in `FIXTURE-NOTICE.md`, so code doesn't reveal the answers during evaluations.
+
 ## [1.1.0] - 2026-10-02
 
 ### Added

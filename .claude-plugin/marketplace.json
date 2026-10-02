@@ -8,7 +8,7 @@
     {
       "name": "cindova-security",
       "source": "./",
-      "description": "Evidence-based security review, secure-coding guardrails and fix verification (appsec-review, wordpress-security, laravel-security, ...)"
+      "description": "Evidence-based security review, secure-coding guardrails and fix verification (appsec-review, nextjs-security, supabase-security, nodejs-security, wordpress-security, laravel-security)"
     }
   ]
 }

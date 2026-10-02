@@ -48,8 +48,8 @@ Use a framework skill when it's installed. Otherwise fall back to this skill's b
 |---|---|---|
 | Laravel | `laravel-security` | available |
 | WordPress / WooCommerce | `wordpress-security` | available |
-| Next.js (+ Supabase) | `nextjs-security`, `supabase-security` | planned |
-| Node.js / Express | `nodejs-security` | planned |
+| Next.js (+ Supabase) | `nextjs-security`, `supabase-security` | available |
+| Node.js / Express | `nodejs-security` | available |
 | NestJS | `nestjs-security` | planned |
 | React | `react-security` | planned |
 | Django | `django-security` | planned |

@@ -8,6 +8,8 @@
 |---|---|---|---|
 | `fixtures/laravel-vulnerable` | `laravel-security` (+ `appsec-review`) | 21 (+4 optional) | 12 |
 | `fixtures/wordpress-vulnerable` | `wordpress-security` (+ `appsec-review`) | 21 (+3 optional) | 12 |
+| `fixtures/nextjs-vulnerable` | `nextjs-security` (+ `appsec-review`) | 21 (+5 optional) | 12 |
+| `fixtures/supabase-vulnerable` | `supabase-security` (+ `appsec-review`) | 20 (+7 optional) | 12 |
 
 Each fixture contains a minimal, realistic app skeleton, a `FIXTURE-NOTICE.md` warning (the only place the code is labeled as insecure), and `expected-findings.json`:
 
@@ -43,6 +45,8 @@ Record results here when skills change, so regressions are visible.
 | 2026-10-02 | laravel-security 1.0.0, appsec-review 1.0.0 | Claude Code 2.1.287 (Opus 5.5), headless, read-only tools | 21/21 | 0/12 | 19/21 within expected severity. L17 (orderBy oracle) rated Low and L06 (Livewire IDOR) rated Medium; a "Severity calibration" section was added to `laravel-security` afterwards. Found an unplanted issue (unpublished posts readable by ID), now O04. Correctly listed 5 traps as safe patterns and explained the reduced CORS impact. |
 | 2026-10-02 | laravel-security 1.1.0, appsec-review 1.0.0 | Claude Code 2.1.287 (Sonnet 5.5), headless, read-only tools | 21/21 | 0/12 | All severities within range after the calibration update (orderBy oracle and Livewire IDOR now High). One scorer trap flag (T08) was a false alarm: the finding was about unthrottled *registration* and explicitly noted login is throttled. |
 | 2026-10-02 | wordpress-security 1.0.0, appsec-review 1.0.0 | Claude Code 2.1.287 (Opus 5.5), headless, read-only tools | 21/21 | 0/12 | Rated placeholder salts Low. Verified correct against `wp_salt()` (WordPress falls back to DB-stored random salts), so the skill and answer key were corrected. Also found CSV formula injection in the export (valid, unplanted). |
+| 2026-10-02 | nextjs-security 1.0.0, appsec-review 1.0.0 | Claude Code 2.1.287 (Sonnet 5.5), `run-eval.mjs` | 21/21 | 0/12 | All severities within expected ranges. |
+| 2026-10-02 | supabase-security 1.0.0, appsec-review 1.0.0 | Claude Code 2.1.287 (Sonnet 5.5), `run-eval.mjs` | 20/20 | 0/12 | All severities within range. Found a valid unplanted Low (comments `document_id` not tied to `org_id`), now O07. |
 
 ## Adding a fixture
 

@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Team {
+  id       String    @id @default(uuid())
+  name     String
+  profiles Profile[]
+  invoices Invoice[]
+}
+
+model Profile {
+  id               String   @id
+  username         String   @unique
+  email            String   @unique
+  displayName      String
+  website          String?
+  bio              String?
+  avatarUrl        String?
+  role             String   @default("member")
+  teamId           String
+  team             Team     @relation(fields: [teamId], references: [id])
+  apiToken         String   @unique
+  mfaRecoveryCodes String[]
+  stripeCustomerId String?
+  createdAt        DateTime @default(now())
+  posts            Post[]
+}
+
+model Invoice {
+  id         String   @id @default(uuid())
+  number     String
+  teamId     String
+  team       Team     @relation(fields: [teamId], references: [id])
+  customer   String
+  total      Decimal
+  status     String   @default("open")
+  archived   Boolean  @default(false)
+  notes      String?
+  createdAt  DateTime @default(now())
+}
+
+model Post {
+  id        String    @id @default(uuid())
+  slug      String    @unique
+  title     String
+  body      String
+  published Boolean   @default(false)
+  authorId  String
+  author    Profile   @relation(fields: [authorId], references: [id])
+  comments  Comment[]
+}
+
+model Comment {
+  id       String @id @default(uuid())
+  postId   String
+  post     Post   @relation(fields: [postId], references: [id])
+  authorId String
+  body     String
+}

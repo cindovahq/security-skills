@@ -1,0 +1,544 @@
+{
+  "fixture": "supabase-vulnerable",
+  "skill": "supabase-security",
+  "description": "Ground truth for evaluating a security review of this fixture. 'findings' must be reported; 'traps' are safe or out-of-context patterns that must NOT be reported as vulnerabilities.",
+  "findings": [
+    {
+      "id": "S01",
+      "title": "Service role key exposed to the browser (NEXT_PUBLIC_ env var, admin client imported by a 'use client' component)",
+      "severity": [
+        "critical"
+      ],
+      "files": [
+        ".env.example",
+        "admin.ts",
+        "MemberAdmin.tsx"
+      ],
+      "keywords": [
+        "NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY",
+        "service_role",
+        "service role",
+        "secret key"
+      ]
+    },
+    {
+      "id": "S02",
+      "title": "public.invoices has no RLS but is granted to authenticated (any signed-up user reads/edits every org's invoices)",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "20260815120000_billing.sql"
+      ],
+      "keywords": [
+        "invoices",
+        "row level security",
+        "rls"
+      ]
+    },
+    {
+      "id": "S03",
+      "title": "profiles update policy lets users set their own role = 'admin', which grants platform-admin access to all organizations and documents",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "20260801090000_core_schema.sql"
+      ],
+      "keywords": [
+        "profiles",
+        "role",
+        "is_platform_admin",
+        "privilege escalation",
+        "self-promot"
+      ]
+    },
+    {
+      "id": "S04",
+      "title": "support_tickets policy trusts user_metadata role (user-editable via updateUser)",
+      "severity": [
+        "high",
+        "critical"
+      ],
+      "files": [
+        "20260801090000_core_schema.sql"
+      ],
+      "keywords": [
+        "user_metadata",
+        "support_tickets"
+      ]
+    },
+    {
+      "id": "S05",
+      "title": "org_members insert policy lets any user join any organization, including as admin (tenant isolation bypass)",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "20260801090000_core_schema.sql"
+      ],
+      "keywords": [
+        "org_members",
+        "join",
+        "self-join",
+        "tenant"
+      ]
+    },
+    {
+      "id": "S06",
+      "title": "Shared-document policy checks share_token is not null instead of matching a token (all shared documents readable by anon)",
+      "severity": [
+        "high",
+        "critical"
+      ],
+      "files": [
+        "20260801090000_core_schema.sql"
+      ],
+      "keywords": [
+        "share_token"
+      ]
+    },
+    {
+      "id": "S07",
+      "title": "SECURITY DEFINER get_org_member_emails() is executable by anon and returns any org's member emails from auth.users",
+      "severity": [
+        "high",
+        "critical"
+      ],
+      "files": [
+        "20260805100000_functions_views.sql"
+      ],
+      "keywords": [
+        "get_org_member_emails"
+      ]
+    },
+    {
+      "id": "S08",
+      "title": "SECURITY DEFINER archive_project() has no fixed search_path and uses unqualified names",
+      "severity": [
+        "medium",
+        "low"
+      ],
+      "files": [
+        "20260805100000_functions_views.sql"
+      ],
+      "keywords": [
+        "search_path",
+        "archive_project"
+      ]
+    },
+    {
+      "id": "S09",
+      "title": "member_directory view (security definer by default) joins auth.users and is granted to anon (all users' emails exposed)",
+      "severity": [
+        "high",
+        "critical"
+      ],
+      "files": [
+        "20260805100000_functions_views.sql"
+      ],
+      "keywords": [
+        "member_directory",
+        "security_invoker",
+        "auth.users"
+      ]
+    },
+    {
+      "id": "S10",
+      "title": "Admin users page authorizes with getSession() and user_metadata.role, then lists all users with the admin client",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "page.tsx"
+      ],
+      "keywords": [
+        "getSession",
+        "user_metadata"
+      ]
+    },
+    {
+      "id": "S11",
+      "title": "Document search uses the admin client with org from the query string and raw input in .or() (cross-tenant read)",
+      "severity": [
+        "high",
+        "critical"
+      ],
+      "files": [
+        "route.ts"
+      ],
+      "keywords": [
+        "cross-tenant",
+        "org_id",
+        "orgId",
+        ".or(",
+        "filter injection",
+        "idor",
+        "admin client"
+      ]
+    },
+    {
+      "id": "S12",
+      "title": "invite-member Edge Function adds any user to any org with a caller-chosen role using the service role, without checking the caller",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "invite-member"
+      ],
+      "keywords": [
+        "authoriz",
+        "orgId",
+        "role",
+        "caller",
+        "admin"
+      ]
+    },
+    {
+      "id": "S13",
+      "title": "link-preview Edge Function (verify_jwt = false) fetches arbitrary URLs and returns the body (unauthenticated SSRF)",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "link-preview"
+      ],
+      "keywords": [
+        "ssrf",
+        "server-side request"
+      ]
+    },
+    {
+      "id": "S14",
+      "title": "invoices storage bucket is public (invoice PDFs readable by anyone with the guessable URL)",
+      "severity": [
+        "high"
+      ],
+      "files": [
+        "20260810100000_storage.sql"
+      ],
+      "keywords": [
+        "invoices"
+      ]
+    },
+    {
+      "id": "S15",
+      "title": "attachments bucket policies only check bucket_id (any user can read, overwrite or delete every org's files)",
+      "severity": [
+        "high"
+      ],
+      "files": [
+        "20260810100000_storage.sql"
+      ],
+      "keywords": [
+        "attachments",
+        "bucket_id",
+        "foldername",
+        "ownership"
+      ]
+    },
+    {
+      "id": "S16",
+      "title": "realtime.messages policies only check the topic prefix (any user can join, read and send on every org's private channel)",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "20260812100000_realtime.sql"
+      ],
+      "keywords": [
+        "realtime.messages",
+        "topic",
+        "membership",
+        "org:"
+      ]
+    },
+    {
+      "id": "S17",
+      "title": "Redirect allow-list includes https://*.vercel.app/** (any Vercel deployment can receive auth codes/tokens)",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "config.toml"
+      ],
+      "keywords": [
+        "vercel.app",
+        "redirect"
+      ]
+    },
+    {
+      "id": "S18",
+      "title": "Staff access by email domain while email confirmation is disabled (anyone can register @teamboard.example and read all documents)",
+      "severity": [
+        "high",
+        "critical"
+      ],
+      "files": [
+        "20260801090000_core_schema.sql",
+        "config.toml"
+      ],
+      "keywords": [
+        "teamboard.example",
+        "enable_confirmations",
+        "email confirmation",
+        "domain"
+      ]
+    },
+    {
+      "id": "S19",
+      "title": "Service role key hardcoded in a committed pg_cron/pg_net job (use Vault and a dedicated key)",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "20260814100000_jobs.sql"
+      ],
+      "keywords": [
+        "cron",
+        "net.http_post",
+        "hardcoded",
+        "bearer",
+        "vault"
+      ]
+    },
+    {
+      "id": "S20",
+      "title": "Materialized view org_usage (cannot use RLS) is granted to authenticated, exposing every org's name and usage",
+      "severity": [
+        "medium",
+        "high"
+      ],
+      "files": [
+        "20260805100000_functions_views.sql"
+      ],
+      "keywords": [
+        "org_usage",
+        "materialized"
+      ]
+    }
+  ],
+  "optional": [
+    {
+      "id": "O01",
+      "title": "Blanket grant of all privileges on all public tables to anon and authenticated (least-privilege grants)",
+      "files": [
+        "20260801090000_core_schema.sql"
+      ],
+      "keywords": [
+        "all tables in schema",
+        "grant select, insert, update, delete",
+        "least privilege",
+        "anon"
+      ]
+    },
+    {
+      "id": "O02",
+      "title": "Deprecated auth.role() used in projects policy",
+      "files": [
+        "20260801090000_core_schema.sql"
+      ],
+      "keywords": [
+        "auth.role"
+      ]
+    },
+    {
+      "id": "O03",
+      "title": "localhost wildcard in additional_redirect_urls",
+      "files": [
+        "config.toml"
+      ],
+      "keywords": [
+        "localhost"
+      ]
+    },
+    {
+      "id": "O04",
+      "title": "attachments bucket has no allowed_mime_types",
+      "files": [
+        "20260810100000_storage.sql"
+      ],
+      "keywords": [
+        "allowed_mime_types",
+        "mime"
+      ]
+    },
+    {
+      "id": "O05",
+      "title": "No CAPTCHA or leaked-password protection configured for open sign-up",
+      "files": [
+        "config.toml"
+      ],
+      "keywords": [
+        "captcha",
+        "leaked password"
+      ]
+    },
+    {
+      "id": "O06",
+      "title": "Chat messages carry a client-supplied author name (spoofable by any sender)",
+      "files": [
+        "OrgChat.tsx"
+      ],
+      "keywords": [
+        "author",
+        "spoof"
+      ]
+    },
+    {
+      "id": "O07",
+      "title": "comments insert check doesn't verify document_id belongs to org_id (integrity / existence probe, Low)",
+      "files": [
+        "core_schema.sql"
+      ],
+      "keywords": [
+        "document_id",
+        "another org",
+        "composite foreign key"
+      ]
+    }
+  ],
+  "traps": [
+    {
+      "id": "T01",
+      "title": "Publishable key in NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY and the browser client is public by design",
+      "files": [
+        ".env.example",
+        "client.ts"
+      ],
+      "keywords": [
+        "publishable"
+      ]
+    },
+    {
+      "id": "T02",
+      "title": "comments read/write policies are correctly scoped for access (TO authenticated, membership, USING + WITH CHECK, (select auth.uid())). Reporting them as an access-control vulnerability is a false positive.",
+      "files": [
+        "20260801090000_core_schema.sql"
+      ],
+      "keywords": [
+        "comments policies",
+        "comments are readable",
+        "comments access",
+        "read comments"
+      ]
+    },
+    {
+      "id": "T03",
+      "title": "private.is_org_member / is_org_admin are SECURITY DEFINER with search_path = '' in an unexposed schema, execute revoked from public/anon",
+      "files": [
+        "20260801090000_core_schema.sql"
+      ],
+      "keywords": [
+        "is_org_member",
+        "is_org_admin"
+      ]
+    },
+    {
+      "id": "T04",
+      "title": "handle_new_user trigger copies only a display name from user metadata (trigger functions are not RPC-callable)",
+      "files": [
+        "20260805100000_functions_views.sql"
+      ],
+      "keywords": [
+        "handle_new_user"
+      ]
+    },
+    {
+      "id": "T05",
+      "title": "stripe-webhook has verify_jwt = false but verifies the Stripe signature on the raw body and is idempotent",
+      "files": [
+        "stripe-webhook"
+      ],
+      "keywords": [
+        "stripe-webhook",
+        "verify_jwt",
+        "signature"
+      ]
+    },
+    {
+      "id": "T06",
+      "title": "project_stats view uses security_invoker = true",
+      "files": [
+        "20260805100000_functions_views.sql"
+      ],
+      "keywords": [
+        "project_stats"
+      ]
+    },
+    {
+      "id": "T07",
+      "title": "avatars bucket is public by design; uploads are restricted to the user's own folder and image MIME types",
+      "files": [
+        "20260810100000_storage.sql"
+      ],
+      "keywords": [
+        "avatars"
+      ]
+    },
+    {
+      "id": "T08",
+      "title": "Edge Function CORS Access-Control-Allow-Origin * with bearer-token auth (no cookies)",
+      "files": [
+        "cors.ts"
+      ],
+      "keywords": [
+        "cors",
+        "access-control-allow-origin",
+        "wildcard"
+      ]
+    },
+    {
+      "id": "T09",
+      "title": "announcements are intentionally public read-only (select using true, no write policies)",
+      "files": [
+        "20260801090000_core_schema.sql"
+      ],
+      "keywords": [
+        "announcements"
+      ]
+    },
+    {
+      "id": "T10",
+      "title": "Server client is created per request with the publishable key and the proxy uses getClaims()",
+      "files": [
+        "proxy.ts",
+        "server.ts"
+      ],
+      "keywords": [
+        "getClaims",
+        "createServerClient",
+        "proxy"
+      ]
+    },
+    {
+      "id": "T11",
+      "title": "webhook_events has RLS enabled with no policies and client grants revoked (server-only table)",
+      "files": [
+        "20260815120000_billing.sql"
+      ],
+      "keywords": [
+        "webhook_events"
+      ]
+    },
+    {
+      "id": "T12",
+      "title": "add_creator_as_admin trigger (SECURITY DEFINER, pinned search_path) makes the org creator its first admin",
+      "files": [
+        "20260805100000_functions_views.sql"
+      ],
+      "keywords": [
+        "add_creator_as_admin"
+      ]
+    }
+  ]
+}
