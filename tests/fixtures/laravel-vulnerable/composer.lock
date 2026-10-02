@@ -1,0 +1,12 @@
+{
+    "_readme": ["Trimmed lock file for the test fixture. Only packages relevant to the evaluation are listed."],
+    "packages": [
+        { "name": "laravel/framework", "version": "v12.20.0", "type": "library" },
+        { "name": "laravel/sanctum", "version": "v4.1.2", "type": "library" },
+        { "name": "livewire/livewire", "version": "v3.6.2", "type": "library" },
+        { "name": "barryvdh/laravel-debugbar", "version": "v3.15.4", "type": "library" }
+    ],
+    "packages-dev": [
+        { "name": "pestphp/pest", "version": "v3.8.2", "type": "library" }
+    ]
+}

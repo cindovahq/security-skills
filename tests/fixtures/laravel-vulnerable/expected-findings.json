@@ -1,0 +1,547 @@
+{
+  "fixture": "laravel-vulnerable",
+  "skill": "laravel-security",
+  "description": "Ground truth for evaluating a security review of this fixture. 'findings' must be reported; 'traps' are safe or out-of-context patterns that must NOT be reported as vulnerabilities.",
+  "findings": [
+    {
+      "id": "L01",
+      "title": "Mass assignment on registration lets anyone become admin",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "RegisterController.php",
+        "User.php"
+      ],
+      "keywords": [
+        "mass assignment",
+        "is_admin",
+        "request->all",
+        "fillable"
+      ]
+    },
+    {
+      "id": "L02",
+      "title": "Admin routes only require authentication (any user can promote users to admin)",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "web.php",
+        "UserAdminController.php"
+      ],
+      "keywords": [
+        "admin",
+        "promote",
+        "function-level",
+        "authorization",
+        "any authenticated",
+        "BFLA"
+      ]
+    },
+    {
+      "id": "L03",
+      "title": "CSRF disabled for admin/* routes",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "app.php"
+      ],
+      "keywords": [
+        "admin/*",
+        "csrf"
+      ]
+    },
+    {
+      "id": "L04",
+      "title": "Unauthenticated SQL injection in post search (whereRaw interpolation)",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "PostController.php"
+      ],
+      "keywords": [
+        "sql injection",
+        "whereRaw",
+        "sqli"
+      ]
+    },
+    {
+      "id": "L05",
+      "title": "IDOR: any user can view any invoice",
+      "severity": [
+        "high"
+      ],
+      "files": [
+        "InvoiceController.php"
+      ],
+      "keywords": [
+        "idor",
+        "invoice",
+        "authoriz",
+        "bola"
+      ]
+    },
+    {
+      "id": "L06",
+      "title": "Livewire EditPost::save has no authorization and unlocked postId",
+      "severity": [
+        "high"
+      ],
+      "files": [
+        "EditPost.php"
+      ],
+      "keywords": [
+        "livewire",
+        "postId",
+        "locked",
+        "authoriz",
+        "save"
+      ]
+    },
+    {
+      "id": "L07",
+      "title": "Path traversal in document download (arbitrary file read, e.g. .env)",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "DocumentController.php"
+      ],
+      "keywords": [
+        "traversal",
+        "../",
+        "download",
+        "arbitrary file"
+      ]
+    },
+    {
+      "id": "L08",
+      "title": "Upload stores client filename on public disk with no type validation (RCE / stored XSS)",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "AvatarController.php"
+      ],
+      "keywords": [
+        "getClientOriginalName",
+        "upload",
+        "php",
+        "public disk",
+        "extension"
+      ]
+    },
+    {
+      "id": "L09",
+      "title": "SSRF in link preview returns response body",
+      "severity": [
+        "high"
+      ],
+      "files": [
+        "PreviewController.php"
+      ],
+      "keywords": [
+        "ssrf",
+        "169.254",
+        "internal",
+        "Http::"
+      ]
+    },
+    {
+      "id": "L10",
+      "title": "env() comparison in InternalSyncController bypassable when config is cached (unauthenticated user dump)",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "InternalSyncController.php"
+      ],
+      "keywords": [
+        "env(",
+        "config:cache",
+        "null",
+        "bypass",
+        "cached"
+      ]
+    },
+    {
+      "id": "L11",
+      "title": "Stripe webhook accepts unsigned events and marks orders paid",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "StripeWebhookController.php"
+      ],
+      "keywords": [
+        "signature",
+        "webhook",
+        "constructEvent",
+        "unsigned",
+        "forge"
+      ]
+    },
+    {
+      "id": "L12",
+      "title": "Stored XSS via raw post body",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "show.blade.php"
+      ],
+      "keywords": [
+        "{!! $post->body",
+        "xss",
+        "raw"
+      ]
+    },
+    {
+      "id": "L13",
+      "title": "Stored XSS via Str::markdown on comments (raw HTML allowed by default)",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "show.blade.php"
+      ],
+      "keywords": [
+        "Str::markdown",
+        "html_input",
+        "markdown"
+      ]
+    },
+    {
+      "id": "L14",
+      "title": "javascript: URLs in user website rendered into href",
+      "severity": [
+        "medium",
+        "high"
+      ],
+      "files": [
+        "show.blade.php",
+        "ProfileController.php",
+        "RegisterController.php"
+      ],
+      "keywords": [
+        "javascript:",
+        "href",
+        "website",
+        "scheme"
+      ]
+    },
+    {
+      "id": "L15",
+      "title": "Broadcast channel orders.{orderId} authorizes everyone",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "channels.php"
+      ],
+      "keywords": [
+        "channel",
+        "orders.",
+        "broadcast",
+        "return true"
+      ]
+    },
+    {
+      "id": "L16",
+      "title": "Livewire v3.6.2 affected by CVE-2025-54068 (RCE)",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "composer.lock"
+      ],
+      "keywords": [
+        "CVE-2025-54068",
+        "livewire",
+        "3.6.4"
+      ]
+    },
+    {
+      "id": "L17",
+      "title": "Sorting by arbitrary column allows inference of hidden columns (password hash, remember_token)",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "MemberDirectoryController.php"
+      ],
+      "keywords": [
+        "orderBy",
+        "sort",
+        "column",
+        "allow-list",
+        "allowlist",
+        "infer"
+      ]
+    },
+    {
+      "id": "L18",
+      "title": "State-changing GET route for post deletion (CSRF-able)",
+      "severity": [
+        "medium",
+        "low"
+      ],
+      "files": [
+        "web.php",
+        "PostController.php"
+      ],
+      "keywords": [
+        "GET",
+        "delete",
+        "csrf",
+        "state-changing"
+      ]
+    },
+    {
+      "id": "L19",
+      "title": "Session cookie HttpOnly disabled by default",
+      "severity": [
+        "medium",
+        "low"
+      ],
+      "files": [
+        "session.php"
+      ],
+      "keywords": [
+        "http_only",
+        "httponly"
+      ]
+    },
+    {
+      "id": "L20",
+      "title": "Unbounded per_page on API user listing",
+      "severity": [
+        "medium",
+        "low"
+      ],
+      "files": [
+        "UserController.php"
+      ],
+      "keywords": [
+        "per_page",
+        "paginate",
+        "unbounded",
+        "cap"
+      ]
+    },
+    {
+      "id": "L21",
+      "title": "CORS wildcard origin with supports_credentials (reflects any origin)",
+      "severity": [
+        "medium",
+        "low",
+        "hardening"
+      ],
+      "files": [
+        "cors.php"
+      ],
+      "keywords": [
+        "cors",
+        "supports_credentials",
+        "allowed_origins"
+      ],
+      "note": "Impact is limited because statefulApi() is not enabled, so api/* uses bearer tokens. A strong review reports it but explains the reduced impact; reporting it as High without that context is over-rated."
+    }
+  ],
+  "optional": [
+    {
+      "id": "O01",
+      "title": "Debugbar in require instead of require-dev",
+      "files": [
+        "composer.json"
+      ],
+      "keywords": [
+        "debugbar",
+        "require-dev"
+      ]
+    },
+    {
+      "id": "O02",
+      "title": "SESSION_SECURE_COOKIE not forced",
+      "files": [
+        "session.php"
+      ],
+      "keywords": [
+        "secure",
+        "SESSION_SECURE_COOKIE"
+      ]
+    },
+    {
+      "id": "O03",
+      "title": "Password reset Host-header hardening (TrustHosts not configured)",
+      "files": [
+        "app.php"
+      ],
+      "keywords": [
+        "trustHosts",
+        "host header"
+      ]
+    },
+    {
+      "id": "O04",
+      "title": "Unpublished posts readable by ID (show() lacks the published_at check used by index())",
+      "files": [
+        "PostController.php"
+      ],
+      "keywords": [
+        "unpublished",
+        "draft",
+        "published_at"
+      ]
+    }
+  ],
+  "traps": [
+    {
+      "id": "T01",
+      "title": "No explicit session()->regenerate() after Auth::attempt \u2014 SessionGuard regenerates on login",
+      "files": [
+        "LoginController.php"
+      ],
+      "keywords": [
+        "fixation",
+        "regenerate"
+      ]
+    },
+    {
+      "id": "T02",
+      "title": "whereRaw('published_at <= ?', [now()]) is parameterized",
+      "files": [
+        "PostController.php"
+      ],
+      "keywords": [
+        "published_at"
+      ]
+    },
+    {
+      "id": "T03",
+      "title": "PostController::destroy is authorized via PostPolicy (only the GET method is an issue)",
+      "files": [
+        "PostController.php",
+        "PostPolicy.php"
+      ],
+      "keywords": [
+        "destroy",
+        "idor"
+      ]
+    },
+    {
+      "id": "T04",
+      "title": "Logout correctly invalidates the session and regenerates the CSRF token",
+      "files": [
+        "LoginController.php"
+      ],
+      "keywords": [
+        "logout",
+        "invalidate"
+      ]
+    },
+    {
+      "id": "T05",
+      "title": "APP_DEBUG=true / APP_ENV=local only in .env.example",
+      "files": [
+        ".env.example"
+      ],
+      "keywords": [
+        "APP_DEBUG"
+      ]
+    },
+    {
+      "id": "T06",
+      "title": "{!! __('Posted :date', ['date' => e(...)]) !!} escapes its only parameter",
+      "files": [
+        "show.blade.php"
+      ],
+      "keywords": [
+        "Posted :date",
+        "__("
+      ]
+    },
+    {
+      "id": "T07",
+      "title": "@json in <script> uses safe default flags",
+      "files": [
+        "show.blade.php"
+      ],
+      "keywords": [
+        "@json"
+      ]
+    },
+    {
+      "id": "T08",
+      "title": "Login is throttled (throttle:login + RateLimiter::for('login'))",
+      "files": [
+        "web.php",
+        "AppServiceProvider.php"
+      ],
+      "keywords": [
+        "brute",
+        "throttl",
+        "rate limit"
+      ]
+    },
+    {
+      "id": "T09",
+      "title": "CSRF exclusion of stripe/* is expected for webhooks (the real issue is L11)",
+      "files": [
+        "app.php"
+      ],
+      "keywords": [
+        "stripe/*"
+      ]
+    },
+    {
+      "id": "T10",
+      "title": "'password' in $fillable is hashed via the 'hashed' cast",
+      "files": [
+        "User.php"
+      ],
+      "keywords": [
+        "password"
+      ]
+    },
+    {
+      "id": "T11",
+      "title": "API UserController selects only id and name (no data exposure)",
+      "files": [
+        "UserController.php"
+      ],
+      "keywords": [
+        "exposure",
+        "sensitive"
+      ]
+    },
+    {
+      "id": "T12",
+      "title": "Laravel v12.20.0 is within security support (until Feb 2027) \u2014 not EOL",
+      "files": [
+        "composer.lock"
+      ],
+      "keywords": [
+        "end-of-life",
+        "EOL",
+        "unsupported"
+      ]
+    }
+  ]
+}

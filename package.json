@@ -1,0 +1,46 @@
+{
+  "name": "@cindova/security-skills",
+  "version": "1.0.0",
+  "description": "Framework-aware security skills for AI coding agents (Claude Code, GitHub Copilot, Kiro, Cursor, Codex, Antigravity, Gemini CLI, Junie, Windsurf/Devin and more).",
+  "type": "module",
+  "bin": {
+    "security-skills": "bin/cli.mjs"
+  },
+  "files": [
+    "bin",
+    "skills",
+    "README.md",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "scripts": {
+    "validate": "node scripts/validate.mjs --strict",
+    "test": "node --test tests/*.test.mjs",
+    "score": "node scripts/score-eval.mjs"
+  },
+  "engines": {
+    "node": ">=18.17"
+  },
+  "keywords": [
+    "agent-skills",
+    "security",
+    "appsec",
+    "claude-code",
+    "copilot",
+    "kiro",
+    "cursor",
+    "codex",
+    "antigravity",
+    "owasp",
+    "laravel",
+    "code-review"
+  ],
+  "homepage": "https://github.com/cindovahq/security-skills#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cindovahq/security-skills.git"
+  },
+  "bugs": "https://github.com/cindovahq/security-skills/issues",
+  "author": "Cindova Technologies (https://cindova.com)",
+  "license": "Apache-2.0"
+}

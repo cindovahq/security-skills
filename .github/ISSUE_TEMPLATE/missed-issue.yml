@@ -1,0 +1,26 @@
+name: Missed vulnerability
+description: A skill didn't detect a real issue it should cover
+labels: ["coverage"]
+body:
+  - type: input
+    id: skill
+    attributes:
+      label: Skill and version
+      placeholder: laravel-security 1.0.0
+    validations:
+      required: true
+  - type: textarea
+    id: pattern
+    attributes:
+      label: Vulnerable code or configuration
+      description: Minimal, sanitized example. Don't post exploits against live systems.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it's vulnerable
+      description: Impact, preconditions, and references (CWE, docs, advisory).
+    validations:
+      required: true

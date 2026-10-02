@@ -1,0 +1,12 @@
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+node_modules/
+*.log
+.env
+.env.*
+!tests/fixtures/**/.env.example
+# local eval output
+tests/results/

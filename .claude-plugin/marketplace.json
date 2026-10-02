@@ -1,0 +1,14 @@
+{
+  "name": "cindova",
+  "description": "Security skills for AI coding agents by Cindova Technologies",
+  "owner": {
+    "name": "Cindova Technologies"
+  },
+  "plugins": [
+    {
+      "name": "cindova-security",
+      "source": "./",
+      "description": "Evidence-based security review, secure-coding guardrails and fix verification (appsec-review, laravel-security, ...)"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+name: False positive / wrong guidance
+description: A skill reported something that isn't a vulnerability, or gave incorrect framework guidance
+labels: ["accuracy"]
+body:
+  - type: input
+    id: skill
+    attributes:
+      label: Skill and version
+      description: From SKILL.md → metadata.version
+      placeholder: laravel-security 1.0.0
+    validations:
+      required: true
+  - type: input
+    id: agent
+    attributes:
+      label: Agent and model
+      placeholder: Claude Code / GitHub Copilot in VS Code / Kiro / Cursor ...
+  - type: textarea
+    id: pattern
+    attributes:
+      label: Code or configuration
+      description: Minimal snippet that triggered the result. Remove secrets and proprietary code.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: reported
+    attributes:
+      label: What the skill reported
+    validations:
+      required: true
+  - type: textarea
+    id: correct
+    attributes:
+      label: Why it's wrong, with evidence
+      description: Link to official docs, framework source, or an advisory.
+    validations:
+      required: true

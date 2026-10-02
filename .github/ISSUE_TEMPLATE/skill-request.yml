@@ -1,0 +1,22 @@
+name: Skill request
+description: Propose a new framework or platform skill
+labels: ["skill-request"]
+body:
+  - type: input
+    id: technology
+    attributes:
+      label: Framework / platform and versions
+      placeholder: Ruby on Rails 7.2–8.x
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it matters
+      description: Usage, common real-world vulnerability classes, and anything existing generic guidance gets wrong.
+  - type: checkboxes
+    id: contribute
+    attributes:
+      label: Contribution
+      options:
+        - label: I'd like to help write or review this skill
