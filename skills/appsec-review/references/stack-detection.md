@@ -50,9 +50,9 @@ Use a framework skill when it's installed. Otherwise fall back to this skill's b
 | WordPress / WooCommerce | `wordpress-security` | available |
 | Next.js (+ Supabase) | `nextjs-security`, `supabase-security` | available |
 | Node.js / Express | `nodejs-security` | available |
-| NestJS | `nestjs-security` | planned |
-| React | `react-security` | planned |
-| Django | `django-security` | planned |
+| NestJS | `nestjs-security` | available |
+| React | `react-security` | available |
+| Django | `django-security` | available |
 | Spring Boot | `spring-boot-security` | planned |
 | ASP.NET Core | `aspnet-core-security` | planned |
 | Flutter | `flutter-security` | planned |

@@ -1,0 +1,713 @@
+{
+  "fixture": "nestjs-vulnerable",
+  "skill": "nestjs-security",
+  "description": "Ground truth for evaluating a security review of this fixture. 'findings' must be reported; 'traps' are safe or out-of-context patterns that must NOT be reported as vulnerabilities.",
+  "findings": [
+    {
+      "id": "F01",
+      "title": "JwtAuthGuard.handleRequest returns the user without throwing when authentication fails, and canActivate then returns true, so every non-@Public route accepts anonymous requests (req.user becomes false) and any handler that does not dereference the user is open",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "jwt-auth.guard.ts"
+      ],
+      "keywords": [
+        "handleRequest",
+        "fail-open",
+        "fails open",
+        "anonymous",
+        "unauthenticated",
+        "!user"
+      ]
+    },
+    {
+      "id": "F02",
+      "title": "JWT secret falls back to a hard-coded literal when JWT_SECRET is unset, in both JwtStrategy and JwtModule, with no startup validation of required configuration; tokens can be forged and no algorithms are pinned",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "jwt.strategy.ts",
+        "auth.module.ts"
+      ],
+      "keywords": [
+        "acme-portal-dev-secret",
+        "hardcoded",
+        "hard-coded",
+        "fallback",
+        "default secret",
+        "JWT_SECRET"
+      ]
+    },
+    {
+      "id": "F03",
+      "title": "Access tokens are issued without expiresIn and JwtStrategy sets ignoreExpiration: true, so stolen tokens never expire and cannot be rotated",
+      "severity": [
+        "medium",
+        "high"
+      ],
+      "files": [
+        "jwt.strategy.ts",
+        "token.service.ts",
+        "auth.module.ts"
+      ],
+      "keywords": [
+        "ignoreExpiration",
+        "expiresIn",
+        "never expire",
+        "no expiry",
+        "expiration"
+      ]
+    },
+    {
+      "id": "F04",
+      "title": "Registration is open to mass assignment: ValidationPipe has no whitelist, RegisterDto has no role field, and AuthService spreads the DTO instance into the entity, so a client-supplied role (for example admin) is persisted",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "auth.service.ts",
+        "main.ts",
+        "register.dto.ts"
+      ],
+      "keywords": [
+        "mass assignment",
+        "whitelist",
+        "privilege escalation",
+        "role",
+        "forbidNonWhitelisted"
+      ]
+    },
+    {
+      "id": "F05",
+      "title": "PATCH /users/:id lets any authenticated user update any account (no caller or ownership check) and the DTO accepts role and isActive, so users can change other users' email and promote themselves",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "users.controller.ts",
+        "users.service.ts",
+        "update-user.dto.ts"
+      ],
+      "keywords": [
+        "IDOR",
+        "BOLA",
+        "BFLA",
+        "privilege escalation",
+        "any user",
+        "another user",
+        "role"
+      ]
+    },
+    {
+      "id": "F06",
+      "title": "Passwords are hashed with a single unsalted SHA-256 and compared with !==, instead of Argon2id or bcrypt",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "auth.service.ts"
+      ],
+      "keywords": [
+        "sha256",
+        "sha-256",
+        "unsalted",
+        "bcrypt",
+        "argon2",
+        "password hash"
+      ]
+    },
+    {
+      "id": "F07",
+      "title": "ThrottlerModule is imported but ThrottlerGuard is never bound (no APP_GUARD, no @UseGuards), so the @Throttle limit on login and the global limit are not enforced; login and registration can be brute-forced",
+      "severity": [
+        "medium",
+        "high"
+      ],
+      "files": [
+        "app.module.ts",
+        "auth.controller.ts"
+      ],
+      "keywords": [
+        "ThrottlerGuard",
+        "APP_GUARD",
+        "rate limit",
+        "rate-limit",
+        "brute force",
+        "brute-force",
+        "throttl"
+      ]
+    },
+    {
+      "id": "F08",
+      "title": "User entity is returned directly from register, login, GET /users/:id and PATCH /users/:id; @Exclude() on passwordHash is inert because ClassSerializerInterceptor is not bound on those controllers, so password hashes (and role, tenantId, internal notes) are sent to clients",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "user.entity.ts",
+        "users.controller.ts",
+        "auth.controller.ts"
+      ],
+      "keywords": [
+        "passwordHash",
+        "@Exclude",
+        "ClassSerializerInterceptor",
+        "password hash",
+        "serializ"
+      ]
+    },
+    {
+      "id": "F09",
+      "title": "GET /invoices/:id returns any invoice by id with no ownership or tenant check (ParseUUIDPipe only validates the format)",
+      "severity": [
+        "high",
+        "critical"
+      ],
+      "files": [
+        "invoices.controller.ts",
+        "invoices.service.ts"
+      ],
+      "keywords": [
+        "IDOR",
+        "BOLA",
+        "ownerId",
+        "ownership",
+        "another user",
+        "other users"
+      ]
+    },
+    {
+      "id": "F10",
+      "title": "AdminController is decorated with @Roles('admin') but RolesGuard is never bound to it (no @UseGuards, not global), so any caller can list and delete users",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "admin.controller.ts"
+      ],
+      "keywords": [
+        "RolesGuard",
+        "@Roles",
+        "not enforced",
+        "UseGuards",
+        "metadata",
+        "admin"
+      ]
+    },
+    {
+      "id": "F11",
+      "title": "SQL injection in ReportsService.revenueByMonth: customerId and sort are interpolated into a raw dataSource.query() string; customerId is also an unscoped identifier (IDOR)",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "reports.service.ts",
+        "reports.controller.ts"
+      ],
+      "keywords": [
+        "SQL injection",
+        "sqli",
+        "customerId",
+        "ORDER BY",
+        "template literal",
+        "string interpolation"
+      ]
+    },
+    {
+      "id": "F12",
+      "title": "SQL injection in InvoicesService.search: the q parameter is interpolated into a QueryBuilder where() string; results are also not scoped to the caller",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "invoices.service.ts",
+        "invoices.controller.ts"
+      ],
+      "keywords": [
+        "SQL injection",
+        "sqli",
+        "ILIKE",
+        "createQueryBuilder",
+        "query builder",
+        "search"
+      ]
+    },
+    {
+      "id": "F13",
+      "title": "Uploads are written to public/uploads with the client-supplied originalname (extension and name preserved, overwrite possible) and that directory is served by ServeStaticModule at /files, enabling stored XSS via HTML/SVG and overwriting other users' files",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "documents.controller.ts",
+        "app.module.ts"
+      ],
+      "keywords": [
+        "originalname",
+        "ServeStaticModule",
+        "stored XSS",
+        "public",
+        "extension",
+        "overwrite",
+        "/files"
+      ]
+    },
+    {
+      "id": "F14",
+      "title": "Path traversal in GET /documents/download/:name: the decoded :name parameter is joined to the upload directory and streamed, so ../ sequences (encoded as %2f) read arbitrary files; there is also no ownership check",
+      "severity": [
+        "high",
+        "critical"
+      ],
+      "files": [
+        "documents.controller.ts"
+      ],
+      "keywords": [
+        "path traversal",
+        "directory traversal",
+        "download",
+        "createReadStream",
+        "../",
+        "arbitrary file"
+      ]
+    },
+    {
+      "id": "F15",
+      "title": "SSRF in POST /integrations/preview: @IsUrl() only validates the format and HttpService fetches the user-supplied URL (redirects followed) and returns the body, reaching internal services and cloud metadata",
+      "severity": [
+        "high",
+        "critical"
+      ],
+      "files": [
+        "integrations.service.ts",
+        "integrations.controller.ts",
+        "preview-url.dto.ts"
+      ],
+      "keywords": [
+        "SSRF",
+        "server-side request forgery",
+        "preview",
+        "IsUrl",
+        "metadata",
+        "internal"
+      ]
+    },
+    {
+      "id": "F16",
+      "title": "CORS reflects any origin with credentials: true while the JWT is also accepted from a cookie that is set without httpOnly, secure or sameSite and there is no CSRF defense, so any website can make credentialed requests as the user",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "main.ts",
+        "auth.controller.ts",
+        "jwt.strategy.ts"
+      ],
+      "keywords": [
+        "CORS",
+        "origin: true",
+        "credentials",
+        "CSRF",
+        "cookie",
+        "httpOnly",
+        "sameSite"
+      ]
+    },
+    {
+      "id": "F17",
+      "title": "GraphQL field-level authorization is not enforced: @Roles('admin') with @UseGuards(RolesGuard) on the Customer.internalNotes @ResolveField does not run because fieldResolverEnhancers is not enabled, so any user can read internalNotes through order.customer",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "orders.resolver.ts",
+        "app.module.ts"
+      ],
+      "keywords": [
+        "fieldResolverEnhancers",
+        "internalNotes",
+        "field resolver",
+        "field-level",
+        "ResolveField"
+      ]
+    },
+    {
+      "id": "F18",
+      "title": "WebSocket gateway trusts a client-supplied userId from the handshake query in handleConnection (no token verification; guards do not run on handleConnection and the gateway is @Public), allowing impersonation and receipt of another user's notifications",
+      "severity": [
+        "high",
+        "critical"
+      ],
+      "files": [
+        "notifications.gateway.ts"
+      ],
+      "keywords": [
+        "handshake",
+        "userId",
+        "handleConnection",
+        "impersonat",
+        "unauthenticated",
+        "authenticat"
+      ]
+    },
+    {
+      "id": "F19",
+      "title": "Hybrid app starts a TCP microservice on 0.0.0.0:4010 without TLS or authentication and without inheritAppConfig, so global guards and pipes do not apply and any network peer can call user.setRole to become admin",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "main.ts",
+        "internal.controller.ts"
+      ],
+      "keywords": [
+        "TCP",
+        "0.0.0.0",
+        "MessagePattern",
+        "setRole",
+        "inheritAppConfig",
+        "microservice"
+      ]
+    },
+    {
+      "id": "F20",
+      "title": "POST /webhooks/payments is public and marks invoices as paid from the request body without verifying any signature or shared secret",
+      "severity": [
+        "high",
+        "critical"
+      ],
+      "files": [
+        "webhooks.controller.ts"
+      ],
+      "keywords": [
+        "payments",
+        "unsigned",
+        "signature",
+        "markPaid",
+        "HMAC",
+        "forged"
+      ]
+    },
+    {
+      "id": "F21",
+      "title": "Outdated, vulnerable NestJS dependencies: @nestjs/platform-express 11.1.0 bundles multer 1.4.5-lts.2 (multer DoS advisories fixed in 2.x, 2.4.0 current), @nestjs/microservices 11.1.0 is affected by the TCP transport advisories (CVE-2026-40879, GHSA-m8vh-jmq9-5rjg / CVE-2026-102281, GHSA-96h4-vgxj-gvm2), plus Apollo Server 4 end of life; upgrade to 11.2.x (latest 11.2.7) or 12.x",
+      "severity": [
+        "medium",
+        "high"
+      ],
+      "files": [
+        "package.json"
+      ],
+      "keywords": [
+        "multer",
+        "CVE-2026-40879",
+        "GHSA-m8vh-jmq9-5rjg",
+        "CVE-2026-102281",
+        "GHSA-96h4-vgxj-gvm2",
+        "11.2",
+        "outdated",
+        "vulnerable dependenc"
+      ]
+    },
+    {
+      "id": "F22",
+      "title": "RequestContextService is a singleton that UserContextInterceptor writes the current user into, and InvoicesService reads it asynchronously after pipes have run, so concurrent requests can see another user's id and receive their invoices",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "request-context.service.ts",
+        "user-context.interceptor.ts",
+        "invoices.service.ts"
+      ],
+      "keywords": [
+        "singleton",
+        "race",
+        "concurren",
+        "request-scoped",
+        "RequestContextService",
+        "AsyncLocalStorage",
+        "cross-request"
+      ]
+    }
+  ],
+  "optional": [
+    {
+      "id": "O01",
+      "title": "Document upload FileInterceptor has no multer limits (fileSize, files), so large uploads exhaust disk",
+      "files": [
+        "documents.controller.ts"
+      ],
+      "keywords": [
+        "limits",
+        "fileSize",
+        "no limit",
+        "size limit",
+        "file size"
+      ]
+    },
+    {
+      "id": "O02",
+      "title": "Open redirect: /auth/sso/callback returns the next query parameter as the @Redirect url without validation",
+      "files": [
+        "auth.controller.ts"
+      ],
+      "keywords": [
+        "open redirect",
+        "@Redirect",
+        "next"
+      ]
+    },
+    {
+      "id": "O03",
+      "title": "Swagger UI and /docs-json are exposed unconditionally, including in production",
+      "files": [
+        "main.ts"
+      ],
+      "keywords": [
+        "swagger",
+        "SwaggerModule",
+        "docs"
+      ]
+    },
+    {
+      "id": "O04",
+      "title": "GraphQL module has introspection forced on, csrfPrevention disabled, stack traces in errors and no depth or complexity limits",
+      "files": [
+        "app.module.ts"
+      ],
+      "keywords": [
+        "introspection",
+        "csrfPrevention",
+        "complexity",
+        "depth",
+        "stacktrace",
+        "stack trace"
+      ]
+    },
+    {
+      "id": "O05",
+      "title": "AllExceptionsFilter returns error.message and error.stack to clients",
+      "files": [
+        "all-exceptions.filter.ts"
+      ],
+      "keywords": [
+        "stack",
+        "exception filter",
+        "AllExceptionsFilter",
+        "stack trace"
+      ]
+    },
+    {
+      "id": "O06",
+      "title": "Gateway subscribe handler joins any room named by the client and the gateway CORS origin is '*'",
+      "files": [
+        "notifications.gateway.ts"
+      ],
+      "keywords": [
+        "room",
+        "subscribe",
+        "cors",
+        "origin"
+      ]
+    },
+    {
+      "id": "O07",
+      "title": "Database credentials hard-coded in app.module.ts and TypeORM synchronize: true",
+      "files": [
+        "app.module.ts"
+      ],
+      "keywords": [
+        "synchronize",
+        "hard-coded",
+        "hardcoded",
+        "acme-db-password-example",
+        "database password",
+        "credentials"
+      ]
+    }
+  ],
+  "traps": [
+    {
+      "id": "T01",
+      "title": "Health check and login/register are intentionally @Public (and @SkipThrottle on health); the health response exposes only status",
+      "files": [
+        "health.controller.ts",
+        "auth.controller.ts"
+      ],
+      "keywords": [
+        "health",
+        "@Public",
+        "SkipThrottle"
+      ]
+    },
+    {
+      "id": "T02",
+      "title": "Shipment webhook verifies an HMAC-SHA256 over req.rawBody with timingSafeEqual and a secret from getOrThrow; public by design, no CSRF needed",
+      "files": [
+        "webhooks.controller.ts"
+      ],
+      "keywords": [
+        "shipments",
+        "timingSafeEqual",
+        "rawBody",
+        "x-acme-signature"
+      ]
+    },
+    {
+      "id": "T03",
+      "title": "ReportsService.countByStatus uses a parameterized raw query ($1)",
+      "files": [
+        "reports.service.ts"
+      ],
+      "keywords": [
+        "countByStatus",
+        "status-counts"
+      ]
+    },
+    {
+      "id": "T04",
+      "title": "InvoicesService.list uses QueryBuilder named parameters and an allow-listed SORT_COLUMNS map validated by ListInvoicesDto, so there is no injection",
+      "files": [
+        "invoices.service.ts",
+        "list-invoices.dto.ts"
+      ],
+      "keywords": [
+        "SORT_COLUMNS",
+        "allow-list",
+        "allowlist",
+        "ListInvoicesDto"
+      ]
+    },
+    {
+      "id": "T05",
+      "title": "ProfileController returns an explicit ProfileDto with @Expose and strategy excludeAll under ClassSerializerInterceptor, so no sensitive fields leak",
+      "files": [
+        "profile.controller.ts",
+        "profile.dto.ts"
+      ],
+      "keywords": [
+        "ProfileDto",
+        "ProfileController",
+        "excludeAll"
+      ]
+    },
+    {
+      "id": "T06",
+      "title": "SettingsAdminController binds RolesGuard with @Roles('admin'), so it is correctly protected",
+      "files": [
+        "settings-admin.controller.ts"
+      ],
+      "keywords": [
+        "SettingsAdminController",
+        "admin/settings",
+        "maintenance"
+      ]
+    },
+    {
+      "id": "T07",
+      "title": "PdfService uses execFile with an argument array, a fixed binary and no shell, so there is no command injection",
+      "files": [
+        "pdf.service.ts"
+      ],
+      "keywords": [
+        "execFile",
+        "pdftotext",
+        "PdfService"
+      ]
+    },
+    {
+      "id": "T08",
+      "title": "TokenService.issueResetToken calls jwt.decode on a token it just signed, only to report the expiry; no trust decision is based on it",
+      "files": [
+        "token.service.ts"
+      ],
+      "keywords": [
+        "issueResetToken",
+        "jwt.decode",
+        "reset token"
+      ]
+    },
+    {
+      "id": "T09",
+      "title": "Placeholder values in .env.example are not real secrets",
+      "files": [
+        ".env.example"
+      ],
+      "keywords": [
+        ".env.example",
+        "replace-with",
+        "placeholder"
+      ]
+    },
+    {
+      "id": "T10",
+      "title": "Avatar upload is hardened: multer limits, memory storage, ParseFilePipe with MaxFileSizeValidator, anchored FileTypeValidator (magic-number check on Nest 11.1), random server-side file name, stored outside the public directory",
+      "files": [
+        "documents.controller.ts",
+        "documents.service.ts"
+      ],
+      "keywords": [
+        "avatar",
+        "saveAvatar",
+        "ParseFilePipe",
+        "MaxFileSizeValidator"
+      ]
+    },
+    {
+      "id": "T11",
+      "title": "PATCH /invoices/:id/notes is scoped to the owner in the service, rejects missing identity, and uses a strict ValidationPipe (whitelist and forbidNonWhitelisted)",
+      "files": [
+        "invoices.controller.ts",
+        "invoices.service.ts",
+        "update-notes.dto.ts"
+      ],
+      "keywords": [
+        "updateNotes",
+        "UpdateNotesDto",
+        "forbidNonWhitelisted"
+      ]
+    },
+    {
+      "id": "T12",
+      "title": "GeoService calls a fixed partner host and only fills an encodeURIComponent-encoded path segment, so it is not SSRF",
+      "files": [
+        "geo.service.ts"
+      ],
+      "keywords": [
+        "GeoService",
+        "geo",
+        "encodeURIComponent"
+      ]
+    },
+    {
+      "id": "T13",
+      "title": "Query.myOrders scopes data to the authenticated user and rejects missing identity; the guard and CurrentUser decorator resolve the request through GqlExecutionContext",
+      "files": [
+        "orders.resolver.ts",
+        "request.util.ts"
+      ],
+      "keywords": [
+        "myOrders",
+        "GqlExecutionContext",
+        "request.util"
+      ]
+    }
+  ]
+}

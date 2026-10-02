@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Tickets</h1>
+<ul>
+{% for ticket in tickets %}
+  <li><a href="{% url 'ticket-detail' ticket.pk %}">{{ ticket.title }}</a> {{ ticket.status_badge }}</li>
+{% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,655 @@
+{
+  "fixture": "django-vulnerable",
+  "skill": "django-security",
+  "description": "Ground truth for evaluating a security review of this fixture. 'findings' must be reported; 'traps' are safe or out-of-context patterns that must NOT be reported as vulnerabilities.",
+  "findings": [
+    {
+      "id": "D01",
+      "title": "DEBUG = True hard-coded in the settings module used for deployment (debug pages expose source, settings and variables)",
+      "severity": [
+        "high",
+        "critical",
+        "medium"
+      ],
+      "files": [
+        "settings.py"
+      ],
+      "keywords": [
+        "DEBUG",
+        "debug mode",
+        "traceback"
+      ]
+    },
+    {
+      "id": "D02",
+      "title": "Hard-coded SECRET_KEY committed to source combined with signed-cookie sessions (session forgery for any user)",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "settings.py"
+      ],
+      "keywords": [
+        "SECRET_KEY",
+        "signed_cookies",
+        "hard-coded",
+        "hardcoded",
+        "forge"
+      ]
+    },
+    {
+      "id": "D03",
+      "title": "MD5PasswordHasher is the first PASSWORD_HASHER and AUTH_PASSWORD_VALIDATORS is not configured",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "settings.py"
+      ],
+      "keywords": [
+        "MD5PasswordHasher",
+        "PASSWORD_HASHERS",
+        "AUTH_PASSWORD_VALIDATORS",
+        "md5"
+      ]
+    },
+    {
+      "id": "D04",
+      "title": "No brute-force protection on the login view (Django does not throttle authentication)",
+      "severity": [
+        "medium",
+        "low"
+      ],
+      "files": [
+        "views.py"
+      ],
+      "keywords": [
+        "brute",
+        "throttl",
+        "rate limit",
+        "lockout",
+        "axes"
+      ]
+    },
+    {
+      "id": "D05",
+      "title": "IDOR: any authenticated user can view any invoice (get_object_or_404 without owner)",
+      "severity": [
+        "high"
+      ],
+      "files": [
+        "views.py"
+      ],
+      "keywords": [
+        "idor",
+        "get_object_or_404",
+        "invoice",
+        "owner",
+        "bola"
+      ]
+    },
+    {
+      "id": "D06",
+      "title": "Function-level access control: any logged-in user can grant is_staff/is_superuser to any account",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "views.py",
+        "urls.py"
+      ],
+      "keywords": [
+        "is_staff",
+        "is_superuser",
+        "set_staff_status",
+        "privilege escalation",
+        "function-level"
+      ]
+    },
+    {
+      "id": "D07",
+      "title": "Unauthenticated SQL injection in knowledge-base search (raw() with an f-string)",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "views.py"
+      ],
+      "keywords": [
+        "sql injection",
+        "raw(",
+        "f-string",
+        "kb_search",
+        "sqli"
+      ]
+    },
+    {
+      "id": "D08",
+      "title": "User-controlled order_by in the member directory allows ordering by password hash and api_token (data oracle)",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "views.py"
+      ],
+      "keywords": [
+        "order_by",
+        "sort",
+        "password",
+        "api_token",
+        "allow-list",
+        "allowlist",
+        "oracle"
+      ]
+    },
+    {
+      "id": "D09",
+      "title": "filter(**request.GET) in ticket list lets clients choose lookups and traverse relations (e.g. other users' password hashes)",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "views.py"
+      ],
+      "keywords": [
+        "**filters",
+        "filter(**",
+        "lookup",
+        "relation",
+        "traversal",
+        "startswith"
+      ]
+    },
+    {
+      "id": "D10",
+      "title": "Stored XSS: comment bodies rendered with the |safe filter (customer comments render to staff, who can view every ticket)",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "ticket_detail.html"
+      ],
+      "keywords": [
+        "|safe",
+        "comment",
+        "xss",
+        "stored",
+        "autoescape"
+      ]
+    },
+    {
+      "id": "D11",
+      "title": "javascript: URLs in the user-controlled website field rendered into href (CharField, no scheme validation)",
+      "severity": [
+        "medium",
+        "high"
+      ],
+      "files": [
+        "directory.html",
+        "models.py",
+        "forms.py"
+      ],
+      "keywords": [
+        "javascript:",
+        "href",
+        "website",
+        "scheme"
+      ]
+    },
+    {
+      "id": "D12",
+      "title": "csrf_exempt on the session-authenticated profile update view (email can be changed cross-site)",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "views.py"
+      ],
+      "keywords": [
+        "csrf_exempt",
+        "csrf",
+        "email",
+        "update_profile"
+      ]
+    },
+    {
+      "id": "D13",
+      "title": "DRF AccountSerializer uses fields = '__all__' (writable is_staff/is_superuser, password hash exposed)",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "serializers.py"
+      ],
+      "keywords": [
+        "__all__",
+        "is_superuser",
+        "is_staff",
+        "password",
+        "mass assignment"
+      ]
+    },
+    {
+      "id": "D14",
+      "title": "REST_FRAMEWORK has no DEFAULT_PERMISSION_CLASSES so AccountViewSet is open to anonymous users (DRF default is AllowAny)",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "settings.py",
+        "views.py"
+      ],
+      "keywords": [
+        "AllowAny",
+        "DEFAULT_PERMISSION_CLASSES",
+        "permission_classes",
+        "unauthenticated",
+        "anonymous"
+      ]
+    },
+    {
+      "id": "D15",
+      "title": "DRF TicketViewSet exposes every user's tickets (class-level queryset, IsAuthenticated only)",
+      "severity": [
+        "high"
+      ],
+      "files": [
+        "views.py"
+      ],
+      "keywords": [
+        "TicketViewSet",
+        "get_queryset",
+        "queryset",
+        "idor",
+        "objects.all",
+        "bola"
+      ]
+    },
+    {
+      "id": "D16",
+      "title": "Attachments accepted without type validation and served same-origin by django.views.static.serve in urls.py (stored XSS via HTML/SVG)",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "urls.py",
+        "views.py",
+        "models.py"
+      ],
+      "keywords": [
+        "serve",
+        "MEDIA",
+        "upload",
+        "extension",
+        "FileField",
+        "html",
+        "svg"
+      ]
+    },
+    {
+      "id": "D17",
+      "title": "Path traversal in report download (os.path.join with user input into FileResponse)",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "views.py"
+      ],
+      "keywords": [
+        "traversal",
+        "os.path.join",
+        "FileResponse",
+        "download_report",
+        "arbitrary file",
+        "../"
+      ]
+    },
+    {
+      "id": "D18",
+      "title": "SSRF in link preview returns the fetched response body",
+      "severity": [
+        "high",
+        "critical"
+      ],
+      "files": [
+        "views.py"
+      ],
+      "keywords": [
+        "ssrf",
+        "link_preview",
+        "requests.get",
+        "169.254",
+        "internal"
+      ]
+    },
+    {
+      "id": "D19",
+      "title": "Open redirect: login redirects to the unvalidated next parameter",
+      "severity": [
+        "medium",
+        "low"
+      ],
+      "files": [
+        "views.py"
+      ],
+      "keywords": [
+        "open redirect",
+        "next",
+        "redirect(",
+        "url_has_allowed_host_and_scheme"
+      ]
+    },
+    {
+      "id": "D20",
+      "title": "Payment webhook trusts unsigned requests and marks invoices paid",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "webhooks.py"
+      ],
+      "keywords": [
+        "signature",
+        "webhook",
+        "payment_webhook",
+        "hmac",
+        "forge",
+        "unsigned"
+      ]
+    },
+    {
+      "id": "D21",
+      "title": "pickle.loads on a client-supplied cookie (remote code execution)",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "views.py"
+      ],
+      "keywords": [
+        "pickle",
+        "restore_view_state",
+        "deserializ",
+        "view_state",
+        "rce"
+      ]
+    },
+    {
+      "id": "D22",
+      "title": "Command injection: Celery task builds a shell command from a user-supplied archive name (shell=True)",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "tasks.py",
+        "views.py"
+      ],
+      "keywords": [
+        "shell=True",
+        "command injection",
+        "export_tickets",
+        "archive_name",
+        "subprocess"
+      ]
+    },
+    {
+      "id": "D23",
+      "title": "Django 4.2 is end-of-life (security support ended April 2026) and the pinned 4.2.20 predates multiple security releases",
+      "severity": [
+        "medium",
+        "high"
+      ],
+      "files": [
+        "requirements.txt"
+      ],
+      "keywords": [
+        "end-of-life",
+        "eol",
+        "4.2",
+        "unsupported",
+        "pip-audit",
+        "CVE"
+      ]
+    }
+  ],
+  "optional": [
+    {
+      "id": "O01",
+      "title": "ALLOWED_HOSTS = ['*'] (Host header poisoning of emailed links)",
+      "files": [
+        "settings.py"
+      ],
+      "keywords": [
+        "ALLOWED_HOSTS",
+        "host header"
+      ]
+    },
+    {
+      "id": "O02",
+      "title": "No HTTPS hardening: SESSION_COOKIE_SECURE, CSRF_COOKIE_SECURE, SECURE_SSL_REDIRECT and HSTS not configured",
+      "files": [
+        "settings.py"
+      ],
+      "keywords": [
+        "SESSION_COOKIE_SECURE",
+        "CSRF_COOKIE_SECURE",
+        "HSTS",
+        "SECURE_SSL_REDIRECT",
+        "check --deploy"
+      ]
+    },
+    {
+      "id": "O03",
+      "title": "Login view logs the submitted password",
+      "files": [
+        "views.py"
+      ],
+      "keywords": [
+        "logger",
+        "password=%s",
+        "logging",
+        "log"
+      ]
+    },
+    {
+      "id": "O04",
+      "title": "JSON built with json.dumps and rendered with |safe inside a script block (view_config)",
+      "files": [
+        "dashboard.html",
+        "views.py"
+      ],
+      "keywords": [
+        "view_config",
+        "json_script",
+        "script"
+      ]
+    },
+    {
+      "id": "O05",
+      "title": "mark_safe with an f-string in the priority_flag template tag",
+      "files": [
+        "support_tags.py"
+      ],
+      "keywords": [
+        "mark_safe",
+        "priority_flag",
+        "format_html"
+      ]
+    },
+    {
+      "id": "O06",
+      "title": "LimitOffsetPagination without max_limit (unbounded ?limit=)",
+      "files": [
+        "settings.py"
+      ],
+      "keywords": [
+        "LimitOffsetPagination",
+        "max_limit",
+        "limit",
+        "pagination"
+      ]
+    },
+    {
+      "id": "O07",
+      "title": "djangorestframework 3.15.1 predates the 3.15.2 fix for CVE-2024-21520 (XSS in the browsable API) and the BrowsableAPIRenderer is enabled by default",
+      "files": [
+        "requirements.txt"
+      ],
+      "keywords": [
+        "CVE-2024-21520",
+        "djangorestframework",
+        "3.15",
+        "browsable"
+      ]
+    }
+  ],
+  "traps": [
+    {
+      "id": "T01",
+      "title": "No explicit cycle_key() after login(): django.contrib.auth.login() rotates the session key",
+      "files": [
+        "views.py"
+      ],
+      "keywords": [
+        "fixation",
+        "cycle_key"
+      ]
+    },
+    {
+      "id": "T02",
+      "title": "Article.objects.raw() in articles_by_category passes category_id through params",
+      "files": [
+        "views.py"
+      ],
+      "keywords": [
+        "articles_by_category",
+        "category_id"
+      ]
+    },
+    {
+      "id": "T03",
+      "title": "Dashboard search uses ORM filters with Q(title__icontains=q); user values are bound parameters",
+      "files": [
+        "views.py"
+      ],
+      "keywords": [
+        "icontains",
+        "dashboard"
+      ]
+    },
+    {
+      "id": "T04",
+      "title": "Ticket.status_badge builds markup with format_html, which escapes its arguments",
+      "files": [
+        "models.py"
+      ],
+      "keywords": [
+        "format_html",
+        "status_badge"
+      ]
+    },
+    {
+      "id": "T05",
+      "title": "repo_webhook is csrf_exempt but verifies an HMAC signature with compare_digest",
+      "files": [
+        "webhooks.py"
+      ],
+      "keywords": [
+        "repo_webhook",
+        "compare_digest"
+      ]
+    },
+    {
+      "id": "T06",
+      "title": "DeviceSyncView uses TokenAuthentication, so no CSRF token is required, and filters by request.user",
+      "files": [
+        "views.py"
+      ],
+      "keywords": [
+        "DeviceSyncView",
+        "TokenAuthentication"
+      ]
+    },
+    {
+      "id": "T07",
+      "title": "ticket_meta is rendered with json_script, which escapes for script context",
+      "files": [
+        "ticket_detail.html"
+      ],
+      "keywords": [
+        "json_script",
+        "ticket_meta"
+      ]
+    },
+    {
+      "id": "T08",
+      "title": "logout_view validates next with url_has_allowed_host_and_scheme and requires POST",
+      "files": [
+        "views.py"
+      ],
+      "keywords": [
+        "logout_view",
+        "url_has_allowed_host_and_scheme"
+      ]
+    },
+    {
+      "id": "T09",
+      "title": "invoice_list and invoice_pdf scope lookups to request.user",
+      "files": [
+        "views.py"
+      ],
+      "keywords": [
+        "invoice_pdf",
+        "invoice_list"
+      ]
+    },
+    {
+      "id": "T10",
+      "title": "settings_test.py uses MD5PasswordHasher and DEBUG for tests only",
+      "files": [
+        "settings_test.py"
+      ],
+      "keywords": [
+        "settings_test",
+        "MD5PasswordHasher"
+      ]
+    },
+    {
+      "id": "T11",
+      "title": "make_thumbnail runs convert with an argument list and no shell",
+      "files": [
+        "tasks.py"
+      ],
+      "keywords": [
+        "make_thumbnail",
+        "convert"
+      ]
+    },
+    {
+      "id": "T12",
+      "title": "exchange_rates fetches a constant URL from settings (FX_RATES_URL), not user input",
+      "files": [
+        "views.py"
+      ],
+      "keywords": [
+        "exchange_rates",
+        "FX_RATES_URL"
+      ]
+    }
+  ]
+}

@@ -60,15 +60,19 @@ return c.redirect(c.req.query('to'));         // Hono
 
 - Express encodes but does not validate redirect targets. Older Express had an allow-list bypass with malformed URLs (CVE-2024-29041, fixed 4.19.2 / 5.0.0-beta.3) and an XSS in `res.redirect()` (CVE-2024-43796, fixed 4.20.0 / 5.0.0).
 - Koa 3 `ctx.back()` only redirects to the `Referer` when its host matches the request host (scheme isn't compared); prefer it to hand-rolled referer redirects.
-- Naive checks that fail: `startsWith('/')` (allows `//evil.example` and `/\evil.example`), `includes('example.com')`, regexes without anchors.
+- Naive checks that fail: `startsWith('/')` (allows `//evil.example` and `/\evil.example`), rejecting only a leading `//` (allows `/<TAB>/evil.example`, because URL parsers strip tabs and newlines, and `/..//evil.example` after normalization), `includes('example.com')`, regexes without anchors.
 
 **Fix:** allow only same-site relative paths, or compare a parsed URL against an allow-list:
 
 ```js
 function safeNext(next, fallback = '/') {
-  if (typeof next !== 'string' || !/^\/(?![\/\\])/.test(next)) return fallback;
-  const u = new URL(next, 'https://app.invalid');
-  return u.origin === 'https://app.invalid' ? u.pathname + u.search + u.hash : fallback;
+  if (typeof next !== 'string' || !next || /[\u0000-\u001F\u007F\\]/.test(next)) return fallback; // URL parsers strip tab/newline
+  const base = 'https://app.invalid';
+  let u;
+  try { u = new URL(next, base); } catch { return fallback; }
+  if (u.origin !== base) return fallback;
+  const out = u.pathname + u.search + u.hash;
+  return out.startsWith('//') ? fallback : out; // normalization can yield //host, e.g. /..//evil
 }
 ```
 

@@ -1,0 +1,603 @@
+{
+  "fixture": "react-vulnerable",
+  "skill": "react-security",
+  "description": "Ground truth for evaluating a security review of this fixture. 'findings' must be reported; 'traps' are safe or out-of-context patterns that must NOT be reported as vulnerabilities.",
+  "findings": [
+    {
+      "id": "R01",
+      "title": "react-router 7.9.2 (with @react-router/node, serve and dev 7.9.2) is affected by many advisories, including CSRF on action requests (CVE-2026-22030), open redirect and XSS issues (CVE-2025-68470, CVE-2026-22029), the framework-mode RCE chain on prototype pollution (CVE-2026-42211) and manifest DoS; upgrade to 7.18.2 or 8.3.0",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "package.json",
+        "package-lock.json"
+      ],
+      "keywords": [
+        "CVE-2026-22030",
+        "CVE-2026-42211",
+        "CVE-2026-22029",
+        "react-router",
+        "7.18.2",
+        "8.3.0",
+        "outdated"
+      ]
+    },
+    {
+      "id": "R02",
+      "title": "Admin users area is guarded only by a client-side redirect in the component: the loader returns every user row (email, role, passwordHash, apiKey, resetToken) and the action changes any user's role for any logged-in account, with no role check",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "admin.users.tsx"
+      ],
+      "keywords": [
+        "requireRole",
+        "client-side",
+        "privilege escalation",
+        "role",
+        "admin"
+      ]
+    },
+    {
+      "id": "R03",
+      "title": "Ticket IDOR across organizations: the ticket loader reads any ticket by id and the action lets any logged-in user comment on or close any ticket (no orgId or requester check)",
+      "severity": [
+        "high"
+      ],
+      "files": [
+        "tickets.$id.tsx"
+      ],
+      "keywords": [
+        "idor",
+        "orgId",
+        "ownership",
+        "another organization",
+        "tenant",
+        "authorization"
+      ]
+    },
+    {
+      "id": "R04",
+      "title": "Mass assignment in the settings action: Object.fromEntries(formData) is written to the user record, so a user can set role, orgId, apiKey or passwordHash",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "settings.tsx"
+      ],
+      "keywords": [
+        "mass assignment",
+        "Object.fromEntries",
+        "role",
+        "orgId"
+      ]
+    },
+    {
+      "id": "R05",
+      "title": "Root loader returns the full user row (passwordHash, apiKey, resetToken, orgId) to every page: it is serialized into the HTML and the .data responses",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "root.tsx",
+        "auth.server.ts"
+      ],
+      "keywords": [
+        "passwordHash",
+        "apiKey",
+        "resetToken",
+        "loader",
+        "serialized",
+        "DTO"
+      ]
+    },
+    {
+      "id": "R06",
+      "title": "Open redirect in the login action: redirect(next) uses the unvalidated next query parameter after authentication",
+      "severity": [
+        "medium",
+        "low",
+        "high"
+      ],
+      "files": [
+        "login.tsx"
+      ],
+      "keywords": [
+        "open redirect",
+        "next",
+        "redirect("
+      ]
+    },
+    {
+      "id": "R07",
+      "title": "DOM-based open redirect and javascript: URL execution: the auth callback passes the returnTo query parameter to window.location.assign",
+      "severity": [
+        "medium",
+        "high"
+      ],
+      "files": [
+        "auth.callback.tsx"
+      ],
+      "keywords": [
+        "returnTo",
+        "window.location",
+        "javascript:",
+        "open redirect"
+      ]
+    },
+    {
+      "id": "R08",
+      "title": "Stored XSS: ticket bodies from customers are rendered with dangerouslySetInnerHTML without sanitization (agents and admins view them)",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "TicketBody.tsx"
+      ],
+      "keywords": [
+        "dangerouslySetInnerHTML",
+        "bodyHtml",
+        "sanitiz",
+        "stored XSS"
+      ]
+    },
+    {
+      "id": "R09",
+      "title": "Stored XSS: knowledge-base articles (including community-authored ones) are converted with marked and rendered with dangerouslySetInnerHTML; marked does not sanitize",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "articles.$slug.tsx"
+      ],
+      "keywords": [
+        "marked",
+        "dangerouslySetInnerHTML",
+        "sanitiz",
+        "Markdown"
+      ]
+    },
+    {
+      "id": "R10",
+      "title": "XSS via inline hydration script: root layout embeds JSON.stringify of the user's name and org into a <script> via dangerouslySetInnerHTML without escaping '<' (</script> breakout)",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "root.tsx"
+      ],
+      "keywords": [
+        "JSON.stringify",
+        "</script>",
+        "__ACME__",
+        "inline script",
+        "script"
+      ]
+    },
+    {
+      "id": "R11",
+      "title": "DOM XSS: SearchHighlight writes the ticket subject and search query into ref.current.innerHTML",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "SearchHighlight.tsx"
+      ],
+      "keywords": [
+        "innerHTML",
+        "ref",
+        "DOM XSS",
+        "highlight"
+      ]
+    },
+    {
+      "id": "R12",
+      "title": "Secrets compiled into the client bundle: VITE_ADMIN_API_TOKEN and a SUPPORT_API_KEY injected through vite define are read by client code (api.ts, UsageMeter) and baked in via the Dockerfile build environment",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "vite.config.ts",
+        "config.ts",
+        "api.ts",
+        "Dockerfile",
+        "UsageMeter.tsx"
+      ],
+      "keywords": [
+        "VITE_ADMIN_API_TOKEN",
+        "SUPPORT_API_KEY",
+        "define",
+        "bundle",
+        "import.meta.env"
+      ]
+    },
+    {
+      "id": "R13",
+      "title": "Access token stored in localStorage (acme_token) and readable by any script, alongside several XSS sinks in the app",
+      "severity": [
+        "medium",
+        "low"
+      ],
+      "files": [
+        "api.ts"
+      ],
+      "keywords": [
+        "localStorage",
+        "acme_token",
+        "token",
+        "httpOnly"
+      ]
+    },
+    {
+      "id": "R14",
+      "title": "postMessage handler in EmbedBridge has no origin check and drives window.location and dangerouslySetInnerHTML; it also posts the access token to the parent with targetOrigin '*'",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "EmbedBridge.tsx"
+      ],
+      "keywords": [
+        "postMessage",
+        "event.origin",
+        "origin",
+        "targetOrigin",
+        "message"
+      ]
+    },
+    {
+      "id": "R15",
+      "title": "Session cookie secret falls back to a hardcoded string (SESSION_SECRET ?? 'acme-helpdesk-dev-secret') and the cookie is not Secure, so sessions can be forged if the variable is unset or the fallback is known",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "session.server.ts"
+      ],
+      "keywords": [
+        "SESSION_SECRET",
+        "acme-helpdesk-dev-secret",
+        "secrets",
+        "fallback",
+        "forge",
+        "secure"
+      ]
+    },
+    {
+      "id": "R16",
+      "title": "Code injection: ReportColumn runs new Function over an expression stored by any user and executed in other users' browsers",
+      "severity": [
+        "high",
+        "critical"
+      ],
+      "files": [
+        "ReportColumn.tsx",
+        "reports.tsx"
+      ],
+      "keywords": [
+        "new Function",
+        "expression",
+        "eval",
+        "code injection"
+      ]
+    },
+    {
+      "id": "R17",
+      "title": "Prototype pollution: the settings action deep-merges parsed JSON from the request into the user's preferences with a recursive merge that does not guard __proto__, constructor or prototype (server-side, and chains with the react-router RCE advisory)",
+      "severity": [
+        "high",
+        "medium",
+        "critical"
+      ],
+      "files": [
+        "merge.server.ts",
+        "settings.tsx"
+      ],
+      "keywords": [
+        "prototype pollution",
+        "__proto__",
+        "deepMerge",
+        "merge"
+      ]
+    },
+    {
+      "id": "R18",
+      "title": "Billing webhook trusts the JSON body without verifying a provider signature, so anyone can change an organization's plan",
+      "severity": [
+        "high",
+        "critical"
+      ],
+      "files": [
+        "api.webhooks.billing.ts"
+      ],
+      "keywords": [
+        "signature",
+        "webhook",
+        "billing",
+        "HMAC",
+        "unauthenticated"
+      ]
+    },
+    {
+      "id": "R19",
+      "title": "Email preview renders untrusted email HTML in an iframe via srcDoc with no sandbox, so scripts run in the application's origin",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "EmailPreview.tsx"
+      ],
+      "keywords": [
+        "srcDoc",
+        "iframe",
+        "sandbox",
+        "email"
+      ]
+    }
+  ],
+  "optional": [
+    {
+      "id": "O01",
+      "title": "build.sourcemap: true publishes production source maps",
+      "files": [
+        "vite.config.ts"
+      ],
+      "keywords": [
+        "sourcemap",
+        "source map"
+      ]
+    },
+    {
+      "id": "O02",
+      "title": "No Content-Security-Policy or other security headers are set in entry.server.tsx or elsewhere (CSP, frame-ancestors, nosniff, Referrer-Policy)",
+      "files": [
+        "entry.server.tsx"
+      ],
+      "keywords": [
+        "Content-Security-Policy",
+        "CSP",
+        "security headers",
+        "frame-ancestors"
+      ]
+    },
+    {
+      "id": "O03",
+      "title": "vite 6.3.5 is behind dev-server advisories (arbitrary file read, server.fs.deny bypasses); only relevant if the dev server is exposed",
+      "files": [
+        "package.json"
+      ],
+      "keywords": [
+        "vite",
+        "dev server",
+        "CVE-2026-39363",
+        "server.fs.deny"
+      ]
+    },
+    {
+      "id": "O04",
+      "title": "Login returns different messages for unknown email and wrong password and has no rate limiting or lockout",
+      "files": [
+        "login.tsx"
+      ],
+      "keywords": [
+        "enumeration",
+        "rate limit",
+        "brute force",
+        "No account found"
+      ]
+    },
+    {
+      "id": "O05",
+      "title": "Cookie-only sessions last 30 days and cannot be revoked server-side",
+      "files": [
+        "session.server.ts"
+      ],
+      "keywords": [
+        "maxAge",
+        "revoke",
+        "session lifetime",
+        "30 days"
+      ]
+    },
+    {
+      "id": "O06",
+      "title": "OAuth callback exchanges the code without a state (or PKCE) check, allowing login CSRF into an attacker account",
+      "files": [
+        "auth.callback.tsx"
+      ],
+      "keywords": [
+        "state",
+        "pkce",
+        "login csrf"
+      ]
+    }
+  ],
+  "traps": [
+    {
+      "id": "T01",
+      "title": "Ticket subjects, names and ids are rendered with normal JSX interpolation and attribute values, which React escapes",
+      "files": [
+        "tickets._index.tsx",
+        "home.tsx"
+      ],
+      "keywords": [
+        "JSX interpolation",
+        "auto-escap",
+        "escaped by React"
+      ]
+    },
+    {
+      "id": "T02",
+      "title": "RichText sanitizes bio HTML with DOMPurify (isomorphic-dompurify 4.4.0 on dompurify 3.4.16) immediately before dangerouslySetInnerHTML",
+      "files": [
+        "RichText.tsx"
+      ],
+      "keywords": [
+        "DOMPurify",
+        "RichText",
+        "sanitize"
+      ]
+    },
+    {
+      "id": "T03",
+      "title": "href={profile.website} on a React 19.1 element: React replaces javascript: URLs, so it is not script execution",
+      "files": [
+        "profile.$handle.tsx"
+      ],
+      "keywords": [
+        "profile.website",
+        "javascript:",
+        "href"
+      ]
+    },
+    {
+      "id": "T04",
+      "title": "target=\"_blank\" without rel=\"noopener\" in ExternalLink and the profile link: browsers imply noopener",
+      "files": [
+        "ExternalLink.tsx",
+        "profile.$handle.tsx"
+      ],
+      "keywords": [
+        "noopener",
+        "tabnabbing",
+        "target"
+      ]
+    },
+    {
+      "id": "T05",
+      "title": "Comments are rendered with react-markdown using defaults (no rehype-raw, default urlTransform), which escapes HTML and drops unsafe URLs",
+      "files": [
+        "Comment.tsx"
+      ],
+      "keywords": [
+        "react-markdown",
+        "ReactMarkdown",
+        "Comment"
+      ]
+    },
+    {
+      "id": "T06",
+      "title": "GitHub webhook verifies an HMAC-SHA256 signature over the raw body with timingSafeEqual",
+      "files": [
+        "api.webhooks.github.ts"
+      ],
+      "keywords": [
+        "github",
+        "x-hub-signature-256",
+        "timingSafeEqual"
+      ]
+    },
+    {
+      "id": "T07",
+      "title": "VITE_SENTRY_DSN and VITE_STRIPE_PUBLISHABLE_KEY are public by design and fine in the client bundle",
+      "files": [
+        "public-config.ts"
+      ],
+      "keywords": [
+        "VITE_SENTRY_DSN",
+        "VITE_STRIPE_PUBLISHABLE_KEY",
+        "publishable",
+        "Sentry"
+      ]
+    },
+    {
+      "id": "T08",
+      "title": "Server-only secrets (DATABASE_URL in db.server.ts, STATUS_API_TOKEN in the home loader) are read in .server modules and loaders, which are removed from the client bundle",
+      "files": [
+        "db.server.ts",
+        "home.tsx"
+      ],
+      "keywords": [
+        "STATUS_API_TOKEN",
+        "DATABASE_URL",
+        "process.env"
+      ]
+    },
+    {
+      "id": "T09",
+      "title": "DebugPanel and the window.__ACME_DEBUG__ assignment are guarded by import.meta.env.DEV and removed from production builds",
+      "files": [
+        "DebugPanel.tsx"
+      ],
+      "keywords": [
+        "import.meta.env.DEV",
+        "DebugPanel",
+        "__ACME_DEBUG__"
+      ]
+    },
+    {
+      "id": "T10",
+      "title": "JsonLd escapes '<' as \\u003c before placing JSON in a script tag",
+      "files": [
+        "JsonLd.tsx"
+      ],
+      "keywords": [
+        "JsonLd",
+        "ld+json",
+        "u003c"
+      ]
+    },
+    {
+      "id": "T11",
+      "title": "The logout action validates its redirect target with toLocalPath (same-origin path only)",
+      "files": [
+        "logout.tsx",
+        "redirect.ts"
+      ],
+      "keywords": [
+        "toLocalPath",
+        "logout"
+      ]
+    },
+    {
+      "id": "T12",
+      "title": "SsoPopup checks event.origin against a fixed origin, checks event.source and validates the payload with zod before use",
+      "files": [
+        "SsoPopup.tsx"
+      ],
+      "keywords": [
+        "SsoPopup",
+        "SSO_ORIGIN",
+        "event.origin"
+      ]
+    },
+    {
+      "id": "T13",
+      "title": "ThemeToggle stores only a non-sensitive theme preference in localStorage and validates it on read",
+      "files": [
+        "ThemeToggle.tsx"
+      ],
+      "keywords": [
+        "acme_theme",
+        "ThemeToggle",
+        "theme"
+      ]
+    },
+    {
+      "id": "T14",
+      "title": "The admin audit log loader and action both call requireRole(request, 'admin'), so that route is correctly authorized server-side",
+      "files": [
+        "admin.audit.tsx"
+      ],
+      "keywords": [
+        "audit",
+        "requireRole",
+        "admin.audit"
+      ]
+    }
+  ]
+}

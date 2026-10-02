@@ -4,6 +4,21 @@ All notable changes to this project are documented here. The format is based on 
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-10-02
+
+### Added
+- `nestjs-security` skill (NestJS 10–12): request pipeline and guard ordering, authentication, authorization, validation and mass assignment, serialization and data exposure, injection, CORS/CSRF/headers, rate limiting and DoS, GraphQL, WebSockets and microservices, file uploads, SSRF and redirects, secrets and config, dependencies, verification. Includes a vulnerable NestJS fixture.
+- `react-security` skill (React 18–19, Vite, React Router 7–8, TanStack): XSS sinks, sanitization and Markdown, SSR and hydration, secrets in client bundles, authentication and token storage, authorization, React Router loaders/actions, other React frameworks, CSRF/CORS, SSRF and redirects, browser APIs, dynamic code, security headers/CSP, dependencies, verification. Includes a vulnerable React Router fixture.
+- `django-security` skill (Django 4.2–6.1, Django REST framework): settings and secrets, authentication, authorization, sessions, CSRF, validation and mass assignment, injection, XSS, SSRF and redirects, file uploads, DRF permissions, API security, background tasks, dependencies, verification. Includes a vulnerable Django + DRF fixture.
+- README notice that AI output can be wrong and every finding and fix needs human review.
+- `docs/PENDING.md` for parked work items.
+
+### Changed
+- `appsec-review` stack routing now points to the NestJS, React and Django skills.
+
+### Fixed
+- `nextjs-security` 1.0.1 and `nodejs-security` 1.0.1: the same-origin redirect helpers could be bypassed. The Next.js one accepted `/<TAB>/evil.example`, which browsers resolve to `//evil.example`, and the Node.js one returned `//evil.example` for `/..//evil.example` after URL normalization. Both now reject control characters and protocol-relative results; all three helpers are tested against the same bypass list.
+
 ## [1.2.0] - 2026-10-02
 
 ### Added

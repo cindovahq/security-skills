@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Members</h1>
+<ul>
+{% for member in members %}
+  <li>
+    <a href="{{ member.website }}">{{ member.username }}</a>
+    <span>{{ member.company }}</span>
+  </li>
+{% endfor %}
+</ul>
+{% endblock %}

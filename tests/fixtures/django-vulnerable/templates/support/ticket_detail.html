@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load support_tags %}
+{% block content %}
+<h1>{{ ticket.title }}</h1>
+<p>{{ ticket.status_badge }} {% priority_flag ticket %}</p>
+<div class="ticket-body">{{ ticket.body|linebreaksbr }}</div>
+<h2>Comments</h2>
+{% for comment in comments %}
+  <div class="comment">
+    <strong>{{ comment.author.username }}</strong>
+    <div>{{ comment.body|safe }}</div>
+  </div>
+{% endfor %}
+<form method="post" action="{% url 'ticket-comment' ticket.pk %}">
+  {% csrf_token %}
+  <textarea name="body"></textarea>
+  <button type="submit">Reply</button>
+</form>
+{{ ticket_meta|json_script:"ticket-meta" }}
+{% endblock %}

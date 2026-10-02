@@ -59,13 +59,18 @@ Fix:
 
 ```ts
 function safePath(input: string | null, fallback = '/') {
-  if (!input || !input.startsWith('/') || input.startsWith('//') || input.startsWith('/\\')) return fallback
-  return input
+  if (!input || /[\u0000-\u001F\u007F\\]/.test(input)) return fallback // URL parsers strip tab/newline: '/\t/evil' becomes '//evil'
+  const base = 'https://app.invalid'
+  let url: URL
+  try { url = new URL(input, base) } catch { return fallback }
+  if (url.origin !== base) return fallback
+  const out = url.pathname + url.search + url.hash
+  return out.startsWith('//') ? fallback : out // normalization can yield //host, e.g. /..//evil
 }
 return NextResponse.redirect(new URL(safePath(searchParams.get('next')), request.url))
 ```
 
-Or compare `new URL(input, base).origin === base.origin`.
+String checks such as `startsWith('/') && !startsWith('//')` are not enough: `/<TAB>/evil.example` passes them and the browser resolves it to `//evil.example`. Test the helper with `//evil.example`, `/\evil.example`, `/<TAB>/evil.example`, `/..//evil.example`, `javascript:alert(1)`, `/ok` and `/a?b=c#d`.
 
 ## Severity notes, false positives, verification
 

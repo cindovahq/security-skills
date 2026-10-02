@@ -5,7 +5,7 @@ license: Apache-2.0
 metadata:
   author: Cindova Technologies
   homepage: https://github.com/cindovahq/security-skills
-  version: "1.0.0"
+  version: "1.0.1"
   status: beta
   framework-versions: "Node.js 22 and 24 LTS (26 Current); Express 4.x and 5.x; Fastify 5.x; Koa 3.x; Hono 4.x"
   last-verified: "2026-10-02"

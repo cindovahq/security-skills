@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Dashboard</h1>
+<form method="get"><input name="q" value="{{ request.GET.q }}"><button>Search</button></form>
+<ul>
+{% for ticket in tickets %}
+  <li>{{ ticket.title }}</li>
+{% endfor %}
+</ul>
+<script>
+  window.viewConfig = {{ view_config|safe }};
+</script>
+{% endblock %}

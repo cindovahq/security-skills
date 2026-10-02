@@ -5,7 +5,7 @@ license: Apache-2.0
 metadata:
   author: Cindova Technologies
   homepage: https://github.com/cindovahq/security-skills
-  version: "1.0.0"
+  version: "1.0.1"
   status: beta
   framework-versions: "Next.js 14.x (unsupported), 15.x (Maintenance LTS until 2026-10-21), 16.x (Active LTS)"
   last-verified: "2026-10-02"

@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Invoice {{ invoice.number }}</h1>
+<p>Billed to {{ invoice.billing_email }}</p>
+<p>Total {{ invoice.total }} ({{ invoice.status }})</p>
+<a href="{% url 'invoice-pdf' invoice.pk %}">Download</a>
+{% endblock %}
