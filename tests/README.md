@@ -9,7 +9,7 @@
 | `fixtures/laravel-vulnerable` | `laravel-security` (+ `appsec-review`) | 21 (+4 optional) | 12 |
 | `fixtures/wordpress-vulnerable` | `wordpress-security` (+ `appsec-review`) | 21 (+3 optional) | 12 |
 
-Each fixture contains a minimal, realistic app skeleton and `expected-findings.json`:
+Each fixture contains a minimal, realistic app skeleton, a `FIXTURE-NOTICE.md` warning (the only place the code is labeled as insecure), and `expected-findings.json`:
 
 - `findings`: issues a good review **must** report (with acceptable severity ranges).
 - `optional`: hardening items that are fine to report.
@@ -17,27 +17,20 @@ Each fixture contains a minimal, realistic app skeleton and `expected-findings.j
 
 ## Running an evaluation
 
-1. Copy the fixture to a temporary directory and **remove `expected-findings.json`** so the agent can't see the answers:
+With Claude Code installed and logged in, one command blinds the fixture, runs a headless review, and scores it:
 
-   ```bash
-   rm -rf /tmp/eval && cp -R tests/fixtures/laravel-vulnerable /tmp/eval && rm /tmp/eval/expected-findings.json
-   ```
+```bash
+node scripts/run-eval.mjs laravel-vulnerable --model sonnet
+node scripts/run-eval.mjs wordpress-vulnerable --model opus
+```
 
-2. Run a review with the skills installed. Example with Claude Code (headless, read-only tools):
+The script copies the fixture to a temporary directory **without** `expected-findings.json` and `FIXTURE-NOTICE.md`, runs `claude -p` with read-only tools and this repository loaded as a plugin, saves the report to `tests/results/` (git-ignored), and prints the score.
 
-   ```bash
-   cd /tmp/eval
-   claude -p "Perform a full security review of this Laravel application. Use the appsec-review and laravel-security skills. Static review only. Output the complete report in Markdown as your final answer (do not write files), with one '### F-NN [SEVERITY] title — Confidence' heading per finding and file:line evidence." \
-     --plugin-dir /path/to/security-skills --allowedTools "Read Glob Grep Skill" > /tmp/eval-report.md
-   ```
+For other agents, do the same by hand: copy the fixture, delete those two files, install the skills (see [docs/INSTALL.md](../docs/INSTALL.md)), ask for a full security review with one `### F-NN [SEVERITY] title — Confidence` heading per finding, save the report, then score it:
 
-   For other agents, install the skills (see [docs/INSTALL.md](../docs/INSTALL.md)), open the fixture copy, send the same prompt, and save the report.
-
-3. Score it:
-
-   ```bash
-   node scripts/score-eval.mjs tests/fixtures/laravel-vulnerable/expected-findings.json /tmp/eval-report.md
-   ```
+```bash
+node scripts/score-eval.mjs tests/fixtures/<fixture>/expected-findings.json report.md
+```
 
 The scorer is a **triage aid**. It matches findings by file name plus keywords, and flags *possible* false positives for traps. Always read the report too, and check severity calibration, evidence quality and fix correctness.
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * DELIBERATELY INSECURE test fixture for Cindova Security Skills evaluations. Do not deploy.
+ * Site configuration.
  */
 
 define( 'DB_NAME', getenv( 'DB_NAME' ) );

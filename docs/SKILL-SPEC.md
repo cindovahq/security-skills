@@ -142,7 +142,8 @@ Each framework skill ships with at least one fixture in `tests/fixtures/<framewo
 - A minimal, realistic app skeleton with **seeded vulnerabilities** across the skill's topics.
 - **Traps:** safe code that looks dangerous, covering the skill's documented false positives.
 - `expected-findings.json` with `findings` (must report), `optional`, and `traps` (must not report as vulnerabilities).
-- No real secrets, no working exploit chains against third parties, and a clear "do not deploy" notice.
+- No real secrets and no working exploit chains against third parties.
+- The "deliberately insecure, do not deploy" notice goes **only** in `FIXTURE-NOTICE.md` at the fixture root. Code, comments and package metadata must not reveal which parts are vulnerable, because evaluations remove the notice and the answer key before the review runs (`node scripts/run-eval.mjs <fixture>`).
 
 See [tests/README.md](../tests/README.md) for running evaluations.
 

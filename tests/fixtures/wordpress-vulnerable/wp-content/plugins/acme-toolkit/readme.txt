@@ -7,5 +7,3 @@ Stable tag: 2.3.1
 License: GPLv2 or later
 
 Forms, entries, previews and WooCommerce extras.
-
-Test fixture for Cindova Security Skills — deliberately insecure. Do not install on a real site.

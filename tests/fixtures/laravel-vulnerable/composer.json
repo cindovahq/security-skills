@@ -1,6 +1,6 @@
 {
-    "name": "cindova/laravel-vulnerable-fixture",
-    "description": "DELIBERATELY VULNERABLE test fixture for security-skills evaluation. Do not deploy.",
+    "name": "acme/portal",
+    "description": "Customer portal",
     "type": "project",
     "require": {
         "php": "^8.2",

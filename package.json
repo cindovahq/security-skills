@@ -16,7 +16,8 @@
   "scripts": {
     "validate": "node scripts/validate.mjs --strict",
     "test": "node --test tests/*.test.mjs",
-    "score": "node scripts/score-eval.mjs"
+    "score": "node scripts/score-eval.mjs",
+    "eval": "node scripts/run-eval.mjs"
   },
   "engines": {
     "node": ">=18.17"
