@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head><meta charset="UTF-8"><title>Profile</title></head>
+<body>
+<form th:action="@{/account/profile}" th:object="${user}" method="post">
+    <label>Display name <input th:field="*{displayName}"></label>
+    <label>Email <input type="email" th:field="*{email}"></label>
+    <button type="submit">Save</button>
+</form>
+<p>Language:
+    <a th:href="@{/account/locale(lang='en',returnUrl='/account/profile')}">English</a>
+    <a th:href="@{/account/locale(lang='fr',returnUrl='/account/profile')}">Français</a>
+</p>
+</body>
+</html>

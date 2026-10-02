@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head><meta charset="UTF-8"><title>Customers</title></head>
+<body>
+<form th:action="@{/customers}" method="get">
+    <input name="q" th:value="${param.q}">
+    <input name="region" th:value="${param.region}">
+    <button type="submit">Search</button>
+</form>
+<ul>
+    <li th:each="c : ${customers}" th:text="|${c.name} (${c.region})|">customer</li>
+</ul>
+</body>
+</html>

@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+</head>
+<body>
+<p th:text="|${user.displayName}: ${#lists.size(invoices)} invoices|">Summary</p>
+<ul>
+    <li th:each="invoice : ${invoices}" th:text="|${invoice.number} ${invoice.amount} ${invoice.status}|">INV-1</li>
+</ul>
+</body>
+</html>

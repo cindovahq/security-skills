@@ -1,0 +1,681 @@
+{
+  "fixture": "aspnet-core-vulnerable",
+  "skill": "aspnet-core-security",
+  "description": "Ground truth for evaluating a security review of this fixture (ASP.NET Core 8 / net8.0, deployed from the Dockerfile). 'findings' must be reported; 'traps' are safe or out-of-context patterns that must NOT be reported as vulnerabilities.",
+  "findings": [
+    {
+      "id": "A01",
+      "title": "Production secrets committed in appsettings.json: JWT symmetric signing key (anyone with the repo can mint tokens with any role or company_id) and the SQL Server password (treat as real: they are committed to the production appsettings.json)",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "appsettings.json"
+      ],
+      "keywords": [
+        "SigningKey",
+        "signing key",
+        "hard-coded",
+        "hardcoded",
+        "committed",
+        "Password="
+      ]
+    },
+    {
+      "id": "A02",
+      "title": "JWT bearer validation disables issuer, audience and lifetime checks (ValidateLifetime = false) while tokens are issued for 30 days",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "Program.cs",
+        "TokenService.cs"
+      ],
+      "keywords": [
+        "ValidateLifetime",
+        "ValidateAudience",
+        "ValidateIssuer",
+        "TokenValidationParameters"
+      ]
+    },
+    {
+      "id": "A03",
+      "title": "No brute-force protection: PasswordSignInAsync and CheckPasswordSignInAsync use lockoutOnFailure: false and no rate limiter covers login or /api/token",
+      "severity": [
+        "medium",
+        "low",
+        "high"
+      ],
+      "files": [
+        "AccountController.cs",
+        "TokenEndpoints.cs"
+      ],
+      "keywords": [
+        "lockoutOnFailure",
+        "lockout",
+        "brute",
+        "rate limit",
+        "credential stuffing"
+      ]
+    },
+    {
+      "id": "A04",
+      "title": "IDOR: InvoicesController.Details loads any invoice by id without checking the customer (Index and Pdf are scoped)",
+      "severity": [
+        "high"
+      ],
+      "files": [
+        "InvoicesController.cs"
+      ],
+      "keywords": [
+        "idor",
+        "bola",
+        "Details",
+        "CustomerId",
+        "owner",
+        "invoice"
+      ]
+    },
+    {
+      "id": "A05",
+      "title": "[AllowAnonymous] on AdminController.ExportUsers overrides the controller's [Authorize(Roles = \"Admin\")]: unauthenticated export of every user's email, phone and company",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "AdminController.cs"
+      ],
+      "keywords": [
+        "AllowAnonymous",
+        "ExportUsers",
+        "export",
+        "unauthenticated",
+        "anonymous"
+      ]
+    },
+    {
+      "id": "A06",
+      "title": "[Authorize(Roles = \"Admin\")] on Razor Page handlers (OnPostGrantAdmin, OnPostLock) is not enforced: any signed-in user can grant the global Admin role or lock any account",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "Users.cshtml.cs"
+      ],
+      "keywords": [
+        "handler",
+        "OnPostGrantAdmin",
+        "GrantAdmin",
+        "page handler",
+        "MVC1001",
+        "privilege escalation"
+      ]
+    },
+    {
+      "id": "A07",
+      "title": "Overposting on the Profile page: TryUpdateModelAsync(user, \"Input\") with no include list binds CompanyId, IsCompanyAdmin, EmailConfirmed, Email and other IdentityUser fields",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "Profile.cshtml.cs"
+      ],
+      "keywords": [
+        "TryUpdateModelAsync",
+        "overposting",
+        "mass assignment",
+        "CompanyId",
+        "IsCompanyAdmin",
+        "include"
+      ]
+    },
+    {
+      "id": "A08",
+      "title": "CSRF on AccountController.ChangeEmail: no [ValidateAntiForgeryToken] or global AutoValidate filter, and the auth cookie is SameSite=None (email takeover then password reset)",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "AccountController.cs",
+        "Program.cs"
+      ],
+      "keywords": [
+        "csrf",
+        "antiforgery",
+        "ValidateAntiForgeryToken",
+        "ChangeEmail",
+        "SameSite"
+      ]
+    },
+    {
+      "id": "A09",
+      "title": "SQL injection in TicketsController.Search: FromSqlRaw with an interpolated string containing the q parameter",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "TicketsController.cs"
+      ],
+      "keywords": [
+        "FromSqlRaw",
+        "sql injection",
+        "sqli",
+        "Search",
+        "interpolat"
+      ]
+    },
+    {
+      "id": "A10",
+      "title": "SQL injection in the /reports/orders minimal API: Dapper QueryAsync on a SQL string concatenated with the status query parameter",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "ReportEndpoints.cs"
+      ],
+      "keywords": [
+        "Dapper",
+        "QueryAsync",
+        "sql injection",
+        "sqli",
+        "status",
+        "/reports/orders"
+      ]
+    },
+    {
+      "id": "A11",
+      "title": "User-controlled dynamic LINQ (Where(filter), OrderBy(sort)) with System.Linq.Dynamic.Core 1.2.25, vulnerable to CVE-2023-32571 remote code execution",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "ReportEndpoints.cs",
+        "Acme.Portal.csproj"
+      ],
+      "keywords": [
+        "System.Linq.Dynamic.Core",
+        "Dynamic.Core",
+        "CVE-2023-32571",
+        "dynamic linq",
+        "filter",
+        "1.2.25"
+      ]
+    },
+    {
+      "id": "A12",
+      "title": "Command injection in /reports/export: ArchiveName from the request body interpolated into a /bin/sh -c command line",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "ReportEndpoints.cs"
+      ],
+      "keywords": [
+        "command injection",
+        "/bin/sh",
+        "ArchiveName",
+        "Process.Start",
+        "ProcessStartInfo",
+        "export"
+      ]
+    },
+    {
+      "id": "A13",
+      "title": "Stored XSS: ticket descriptions rendered with @Html.Raw in Views/Tickets/Details.cshtml (seen by every user in the company)",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "Tickets/Details.cshtml",
+        "TicketsController.cs"
+      ],
+      "keywords": [
+        "Html.Raw",
+        "xss",
+        "stored",
+        "cross-site scripting"
+      ]
+    },
+    {
+      "id": "A14",
+      "title": "Open redirect after login: Redirect(model.ReturnUrl) without Url.IsLocalUrl or LocalRedirect",
+      "severity": [
+        "medium",
+        "low"
+      ],
+      "files": [
+        "AccountController.cs"
+      ],
+      "keywords": [
+        "open redirect",
+        "ReturnUrl",
+        "LocalRedirect",
+        "IsLocalUrl",
+        "Redirect("
+      ]
+    },
+    {
+      "id": "A15",
+      "title": "SSRF in /integrations/link-preview: HttpClient.GetStringAsync on a user-supplied URL, response snippet returned to the caller",
+      "severity": [
+        "high",
+        "critical",
+        "medium"
+      ],
+      "files": [
+        "IntegrationEndpoints.cs"
+      ],
+      "keywords": [
+        "ssrf",
+        "link-preview",
+        "GetStringAsync",
+        "169.254",
+        "internal",
+        "server-side request forgery"
+      ]
+    },
+    {
+      "id": "A16",
+      "title": "Path traversal / arbitrary file read in FilesController.Download: Path.Combine(exportRoot, name) passed to PhysicalFile (also no company scoping of exports)",
+      "severity": [
+        "high",
+        "critical"
+      ],
+      "files": [
+        "FilesController.cs"
+      ],
+      "keywords": [
+        "path traversal",
+        "traversal",
+        "PhysicalFile",
+        "Path.Combine",
+        "Download",
+        "../"
+      ]
+    },
+    {
+      "id": "A17",
+      "title": "Avatar upload stores the client-supplied IFormFile.FileName under wwwroot/uploads with no type check (path traversal on write, overwrite, HTML/SVG served same-origin as stored XSS)",
+      "severity": [
+        "high",
+        "medium",
+        "critical"
+      ],
+      "files": [
+        "FilesController.cs"
+      ],
+      "keywords": [
+        "FileName",
+        "upload",
+        "wwwroot",
+        "UploadAvatar",
+        "svg",
+        "extension"
+      ]
+    },
+    {
+      "id": "A18",
+      "title": "Insecure deserialization: Newtonsoft.Json TypeNameHandling.All on the /api/imports/orders request body (attacker chooses .NET types)",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "ImportController.cs"
+      ],
+      "keywords": [
+        "TypeNameHandling",
+        "deserializ",
+        "Newtonsoft",
+        "ImportOrders",
+        "$type"
+      ]
+    },
+    {
+      "id": "A19",
+      "title": "CORS policy reflects any origin with credentials (SetIsOriginAllowed(_ => true) + AllowCredentials) for a cookie-authenticated app",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "Program.cs"
+      ],
+      "keywords": [
+        "cors",
+        "SetIsOriginAllowed",
+        "AllowCredentials"
+      ]
+    },
+    {
+      "id": "A20",
+      "title": "UseDeveloperExceptionPage() is called unconditionally, so production errors show stack traces, source, headers and cookies",
+      "severity": [
+        "medium",
+        "low",
+        "high"
+      ],
+      "files": [
+        "Program.cs"
+      ],
+      "keywords": [
+        "UseDeveloperExceptionPage",
+        "developer exception",
+        "stack trace"
+      ]
+    },
+    {
+      "id": "A21",
+      "title": "SignalR SupportHub.JoinTicket/SendMessage accept any ticketId without checking the caller's company: subscribe to and post into other customers' ticket conversations",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "SupportHub.cs"
+      ],
+      "keywords": [
+        "JoinTicket",
+        "SignalR",
+        "hub",
+        "group",
+        "ticketId",
+        "AddToGroupAsync"
+      ]
+    },
+    {
+      "id": "A22",
+      "title": "Payment webhook /webhooks/payments is anonymous and unsigned: anyone can mark any invoice as paid",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "IntegrationEndpoints.cs"
+      ],
+      "keywords": [
+        "webhook",
+        "signature",
+        "unsigned",
+        "payments",
+        "HMAC",
+        "forge"
+      ]
+    },
+    {
+      "id": "A23",
+      "title": "Runtime image pinned to mcr.microsoft.com/dotnet/aspnet:8.0.20, below the CVE-2025-55315 Kestrel request smuggling fix (8.0.21) and later 2026 patches; .NET 8 support ends 2026-11-10",
+      "severity": [
+        "high",
+        "critical",
+        "medium"
+      ],
+      "files": [
+        "Dockerfile",
+        "Acme.Portal.csproj"
+      ],
+      "keywords": [
+        "8.0.20",
+        "CVE-2025-55315",
+        "request smuggling",
+        "end of support",
+        "runtime",
+        "patch"
+      ]
+    }
+  ],
+  "optional": [
+    {
+      "id": "O01",
+      "title": "Weak Identity password policy (RequiredLength = 4, character classes disabled)",
+      "files": [
+        "Program.cs"
+      ],
+      "keywords": [
+        "RequiredLength",
+        "password policy",
+        "weak password"
+      ]
+    },
+    {
+      "id": "O02",
+      "title": "Forwarded headers trusted from any source (KnownNetworks.Clear() and KnownProxies.Clear()): spoofable client IP and scheme if the container is reachable without the proxy",
+      "files": [
+        "Program.cs"
+      ],
+      "keywords": [
+        "KnownNetworks",
+        "KnownProxies",
+        "forwarded",
+        "X-Forwarded-For"
+      ]
+    },
+    {
+      "id": "O03",
+      "title": "EF Core EnableSensitiveDataLogging() enabled in every environment",
+      "files": [
+        "Program.cs"
+      ],
+      "keywords": [
+        "EnableSensitiveDataLogging",
+        "sensitive data logging"
+      ]
+    },
+    {
+      "id": "O04",
+      "title": "Swagger JSON and Swagger UI exposed in production, before authentication",
+      "files": [
+        "Program.cs"
+      ],
+      "keywords": [
+        "UseSwagger",
+        "Swagger",
+        "OpenAPI"
+      ]
+    },
+    {
+      "id": "O05",
+      "title": "Newtonsoft.Json 12.0.3 is below 13.0.1 (CVE-2024-21907 denial of service)",
+      "files": [
+        "Acme.Portal.csproj"
+      ],
+      "keywords": [
+        "CVE-2024-21907",
+        "Newtonsoft.Json",
+        "12.0.3"
+      ]
+    },
+    {
+      "id": "O06",
+      "title": "AllowedHosts \"*\" and no HSTS (UseHsts missing)",
+      "files": [
+        "appsettings.json",
+        "Program.cs"
+      ],
+      "keywords": [
+        "AllowedHosts",
+        "HSTS",
+        "UseHsts",
+        "host header"
+      ]
+    },
+    {
+      "id": "O07",
+      "title": "Email change applied immediately with SetEmailAsync, without confirming the new address",
+      "files": [
+        "AccountController.cs"
+      ],
+      "keywords": [
+        "SetEmailAsync",
+        "confirmation",
+        "GenerateChangeEmailTokenAsync"
+      ]
+    }
+  ],
+  "traps": [
+    {
+      "id": "T01",
+      "title": "TicketsController.Details uses FromSql($\"...{id}...{CompanyId}\"): FormattableString holes become DbParameters, and the query is company-scoped",
+      "files": [
+        "TicketsController.cs"
+      ],
+      "keywords": [
+        "FromSql(",
+        "FromSql($"
+      ]
+    },
+    {
+      "id": "T02",
+      "title": "TicketsController.Queue uses FromSqlRaw with a {0} placeholder and the value passed as a parameter (Support role only)",
+      "files": [
+        "TicketsController.cs"
+      ],
+      "keywords": [
+        "Queue",
+        "{0}"
+      ]
+    },
+    {
+      "id": "T03",
+      "title": "Tickets/Details.cshtml renders @Model.Ticket.Subject and comments with Razor encoding, and ticket metadata with @Json.Serialize (default encoder escapes <, >, &, ')",
+      "files": [
+        "Tickets/Details.cshtml"
+      ],
+      "keywords": [
+        "Json.Serialize",
+        "ticketMeta",
+        "Subject",
+        "comment.Body"
+      ]
+    },
+    {
+      "id": "T04",
+      "title": "AccountController.Logout uses LocalRedirect(returnUrl), which rejects non-local URLs",
+      "files": [
+        "AccountController.cs"
+      ],
+      "keywords": [
+        "Logout"
+      ]
+    },
+    {
+      "id": "T05",
+      "title": "/health is [AllowAnonymous] under the fallback policy and returns only a static status",
+      "files": [
+        "Program.cs"
+      ],
+      "keywords": [
+        "/health",
+        "health"
+      ]
+    },
+    {
+      "id": "T06",
+      "title": "Profile Razor Page POST has no [ValidateAntiForgeryToken]: Razor Pages validate antiforgery tokens automatically",
+      "files": [
+        "Profile.cshtml.cs",
+        "Profile.cshtml"
+      ],
+      "keywords": [
+        "csrf",
+        "antiforgery"
+      ]
+    },
+    {
+      "id": "T07",
+      "title": "/api/v1/devices group uses DisableAntiforgery() but requires the JWT-only ApiClients policy (no cookies), checks device ownership, and stores uploads under random names outside wwwroot",
+      "files": [
+        "IntegrationEndpoints.cs"
+      ],
+      "keywords": [
+        "DisableAntiforgery",
+        "devices",
+        "ApiClients",
+        "GetRandomFileName"
+      ]
+    },
+    {
+      "id": "T08",
+      "title": "Thumbnail endpoint runs /usr/bin/convert with ArgumentList (no shell), a server-side stored file name and a company-scoped document lookup",
+      "files": [
+        "ReportEndpoints.cs"
+      ],
+      "keywords": [
+        "thumbnail",
+        "convert",
+        "ArgumentList"
+      ]
+    },
+    {
+      "id": "T09",
+      "title": "InvoicesController.Index and Pdf filter by the current user's id",
+      "files": [
+        "InvoicesController.cs"
+      ],
+      "keywords": [
+        "invoice pdf",
+        "pdf download",
+        "InvoicesController.Pdf"
+      ]
+    },
+    {
+      "id": "T10",
+      "title": "appsettings.Development.json uses LocalDB with integrated security and DetailedErrors for local development only (the Dockerfile sets Production)",
+      "files": [
+        "appsettings.Development.json"
+      ],
+      "keywords": [
+        "appsettings.Development",
+        "DetailedErrors",
+        "localdb"
+      ]
+    },
+    {
+      "id": "T11",
+      "title": "fx-rates calls a configured partner base URL with an allow-listed currency code, not a user URL",
+      "files": [
+        "IntegrationEndpoints.cs"
+      ],
+      "keywords": [
+        "fx-rates",
+        "FxRatesUrl",
+        "SupportedCurrencies"
+      ]
+    },
+    {
+      "id": "T12",
+      "title": "/webhooks/docs-sync verifies an HMAC-SHA256 signature over the raw body with CryptographicOperations.FixedTimeEquals before enqueueing (the secret is supplied through the environment)",
+      "files": [
+        "IntegrationEndpoints.cs"
+      ],
+      "keywords": [
+        "docs-sync",
+        "FixedTimeEquals"
+      ]
+    },
+    {
+      "id": "T13",
+      "title": "ImportCatalog parses XML with XDocument.Load: no XmlResolver, so external entities are not resolved, and entity expansion is capped",
+      "files": [
+        "ImportController.cs"
+      ],
+      "keywords": [
+        "XDocument",
+        "xxe",
+        "ImportCatalog",
+        "XML external entit"
+      ]
+    }
+  ]
+}

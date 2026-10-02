@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Acme Portal</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <nav class="navbar">
+        <a asp-controller="Invoices" asp-action="Index">Invoices</a>
+        <a asp-controller="Tickets" asp-action="Index">Support</a>
+        <a asp-page="/Profile">Profile</a>
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-page="/Admin/Users">Team</a>
+        }
+        <span class="user">@User.Identity?.Name</span>
+    </nav>
+    <main class="container">
+        @RenderBody()
+    </main>
+    <script src="~/lib/signalr/signalr.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

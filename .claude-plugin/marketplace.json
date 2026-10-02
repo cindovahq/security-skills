@@ -8,7 +8,7 @@
     {
       "name": "cindova-security",
       "source": "./",
-      "description": "Evidence-based security review, secure-coding guardrails and fix verification (appsec-review, nextjs-security, react-security, supabase-security, nodejs-security, nestjs-security, django-security, wordpress-security, laravel-security)"
+      "description": "Evidence-based security review, secure-coding guardrails and fix verification (appsec-review, nextjs-security, react-security, supabase-security, nodejs-security, nestjs-security, django-security, spring-boot-security, aspnet-core-security, flutter-security, wordpress-security, laravel-security)"
     }
   ]
 }

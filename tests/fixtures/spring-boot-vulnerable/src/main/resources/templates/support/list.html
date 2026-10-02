@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head><meta charset="UTF-8"><title>My tickets</title></head>
+<body>
+<ul>
+    <li th:each="t : ${tickets}"><a th:href="@{/support/tickets/{id}(id=${t.id})}" th:text="${t.subject}">ticket</a></li>
+</ul>
+<form th:action="@{/support/tickets}" method="post">
+    <input name="subject" maxlength="200">
+    <textarea name="body"></textarea>
+    <button type="submit">Open ticket</button>
+</form>
+</body>
+</html>

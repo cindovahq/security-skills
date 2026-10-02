@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head><meta charset="UTF-8"><title>Cart</title></head>
+<body>
+<ul>
+    <li th:each="item : ${cart.items}" th:text="|${item.sku} x ${item.quantity}|">item</li>
+</ul>
+<form th:action="@{/cart/items}" method="post">
+    <input name="sku"> <input name="quantity" type="number" min="1" value="1">
+    <button type="submit">Add</button>
+</form>
+</body>
+</html>

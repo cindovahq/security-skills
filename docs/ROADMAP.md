@@ -15,23 +15,28 @@ Priorities are based on how widely each stack is used with AI coding agents and 
 | `nestjs-security` (NestJS 10–12) | 1.0.0 |
 | `react-security` (React 18–19, Vite, React Router, TanStack) | 1.0.0 |
 | `django-security` (Django 4.2–6.1, Django REST framework) | 1.0.0 |
+| `spring-boot-security` (Spring Boot 3.x–4.x, Spring Security 6.5–7.x) | 1.0.0 |
+| `aspnet-core-security` (ASP.NET Core on .NET 8–10) | 1.0.0 |
+| `flutter-security` (Flutter 3.x, Dart 3.x) | 1.0.0 |
 
-## Next: framework skills
+## Next
 
-Each one follows the `laravel-security` template: a short `SKILL.md` workflow, references for authentication, authorization, sessions, CSRF, validation, injection, XSS, SSRF, uploads, secrets/config, APIs, dependencies and verification, plus a vulnerable fixture with an answer key.
+The first framework roadmap is complete. Next candidates, in rough priority order (open an issue to vote):
 
-| Order | Skill | Notes |
-|---|---|---|
-| 1 | `spring-boot-security` | `SecurityFilterChain`, method security, Actuator, SpEL, deserialization, JPA queries |
-| 2 | `aspnet-core-security` | Authorization policies, antiforgery, EF Core raw SQL, Data Protection, model binding |
-| 3 | `flutter-security` | Secure storage, certificate pinning, deep links, WebViews, secrets in binaries, platform channels |
+| Skill | Notes |
+|---|---|
+| `rails-security` | Strong parameters, `find` scoping, `html_safe`/`raw`, `send`/`constantize`, Active Storage, credentials |
+| `fastapi-security` | Dependency-based auth, Pydantic models and response filtering, SQLAlchemy raw SQL, CORS, background tasks |
+| `firebase-security` | Firestore/RTDB/Storage rules, App Check, Cloud Functions auth, Admin SDK keys |
+| `go-security` | `net/http`, Gin/Echo, `database/sql`, `html/template` vs `text/template`, SSRF, path handling |
+| `github-actions-security` | `pull_request_target`, script injection, token permissions, pinned actions, OIDC |
 
 ## Later
 
-- **Frameworks:** Ruby on Rails, FastAPI, Flask, Express (separate from Node), SvelteKit, Nuxt, Go (net/http, Gin, Echo), Rust (Axum, Actix), Symfony, Angular, Vue, React Native, Android (Kotlin), iOS (Swift), Electron, browser extensions, Shopify apps.
-- **Platforms and data:** Firebase (security rules), PostgreSQL (roles, RLS), MySQL, MongoDB, Redis, Elasticsearch.
+- **Frameworks:** Flask, SvelteKit, Nuxt, Rust (Axum, Actix), Symfony, Angular, Vue, React Native, Android (Kotlin), iOS (Swift), Electron, browser extensions, Shopify apps.
+- **Platforms and data:** PostgreSQL (roles, RLS), MySQL, MongoDB, Redis, Elasticsearch.
 - **Infrastructure:** Docker, Kubernetes, Terraform, Nginx/Apache, AWS, Azure, GCP, Cloudflare (Workers/WAF), serverless (Lambda, Vercel, Netlify).
-- **CI/CD:** GitHub Actions and GitLab CI skills (currently covered in `appsec-review` → `supply-chain.md`).
+- **CI/CD:** GitLab CI, CircleCI and Jenkins skills (currently covered in `appsec-review` → `supply-chain.md`).
 - **AI:** dedicated `llm-app-security` and `mcp-server-security` skills (currently covered in `appsec-review` → `llm-security.md`).
 - **Payments:** Stripe, PayPal and Razorpay integration checks (webhooks, idempotency, amount integrity).
 

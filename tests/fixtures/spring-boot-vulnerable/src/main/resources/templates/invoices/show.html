@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head><meta charset="UTF-8"><title>Invoice</title></head>
+<body>
+<h1 th:text="${invoice.number}">INV-1</h1>
+<dl>
+    <dt>Customer</dt><dd th:text="${invoice.customer?.name}">Customer</dd>
+    <dt>Billing email</dt><dd th:text="${invoice.customer?.email}">email</dd>
+    <dt>Amount</dt><dd th:text="${invoice.amount}">0.00</dd>
+    <dt>Due</dt><dd th:text="${invoice.dueDate}">date</dd>
+    <dt>Status</dt><dd th:text="${invoice.status}">OPEN</dd>
+</dl>
+<a th:href="@{/invoices/{id}/pdf(id=${invoice.id})}">Download PDF</a>
+</body>
+</html>

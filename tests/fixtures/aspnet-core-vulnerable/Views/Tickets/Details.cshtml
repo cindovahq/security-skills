@@ -1,0 +1,41 @@
+@model TicketDetailsViewModel
+@{
+    ViewData["Title"] = Model.Ticket.Subject;
+}
+
+<article class="ticket">
+    <header>
+        <h1>@Model.Ticket.Subject</h1>
+        <p class="meta">
+            Opened by @Model.Ticket.CreatedByName on @Model.Ticket.CreatedOn.ToString("d")
+            <span class="badge">@Model.Ticket.Status</span>
+        </p>
+    </header>
+
+    <section class="ticket-body">
+        @Html.Raw(Model.Ticket.Description)
+    </section>
+
+    <section class="comments">
+        <h2>Comments</h2>
+        @foreach (var comment in Model.Ticket.Comments.OrderBy(c => c.CreatedOn))
+        {
+            <div class="comment">
+                <strong>@comment.AuthorName</strong>
+                <p>@comment.Body</p>
+            </div>
+        }
+
+        <form asp-action="AddComment" asp-route-id="@Model.Ticket.Id" method="post">
+            <textarea name="body" rows="4" class="form-control"></textarea>
+            <button type="submit" class="btn btn-primary">Add comment</button>
+        </form>
+    </section>
+</article>
+
+@section Scripts {
+    <script>
+        window.ticketMeta = @Json.Serialize(Model.Meta);
+    </script>
+    <script src="~/js/ticket-live.js" asp-append-version="true"></script>
+}

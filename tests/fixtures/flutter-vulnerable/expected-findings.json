@@ -1,0 +1,728 @@
+{
+  "fixture": "flutter-vulnerable",
+  "skill": "flutter-security",
+  "description": "Ground truth for evaluating a security review of this fixture. 'findings' must be reported; 'traps' are safe or out-of-context patterns that must NOT be reported as vulnerabilities.",
+  "findings": [
+    {
+      "id": "F01",
+      "title": "Server-side credentials are hardcoded as Dart string constants in AppConfig (mail provider API key mailProviderKey and reporting admin token reportingAdminToken) and sent from the app in the admin screen, so they ship in libapp.so and can be extracted from any APK or IPA; they must be rotated and moved behind a backend",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "app_config.dart",
+        "admin_screen.dart"
+      ],
+      "keywords": [
+        "hardcoded",
+        "mailProviderKey",
+        "reportingAdminToken",
+        "binary",
+        "extract",
+        "rotate"
+      ]
+    },
+    {
+      "id": "F02",
+      "title": "The .env file is listed under flutter assets and loaded with flutter_dotenv, so DATABASE_URL (with database credentials), SMTP_PASSWORD and JWT_SIGNING_SECRET are bundled in plain text in the APK/IPA; the .env is also committed to the repository",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        ".env",
+        "pubspec.yaml",
+        "main.dart"
+      ],
+      "keywords": [
+        "flutter_dotenv",
+        "DATABASE_URL",
+        "JWT_SIGNING_SECRET",
+        "asset",
+        "bundled",
+        "plain text"
+      ]
+    },
+    {
+      "id": "F03",
+      "title": "Release builds pass ADMIN_API_TOKEN and PAYMENTS_SECRET_KEY to the app with --dart-define-from-file=config/prod.json (committed) and rely on --obfuscate; the values are compile-time constants in the snapshot, and the payment provider secret key is used directly from the app to issue refunds",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "prod.json",
+        "build_release.sh",
+        "payment_service.dart",
+        "app_config.dart"
+      ],
+      "keywords": [
+        "dart-define",
+        "ADMIN_API_TOKEN",
+        "PAYMENTS_SECRET_KEY",
+        "obfuscate",
+        "obfuscation",
+        "secret key"
+      ]
+    },
+    {
+      "id": "F04",
+      "title": "The access token, ID token and the full user profile (including the role) are cached in shared_preferences, which is unencrypted plaintext storage readable from backups or a rooted device; tokens belong in flutter_secure_storage",
+      "severity": [
+        "medium",
+        "high"
+      ],
+      "files": [
+        "session_cache.dart"
+      ],
+      "keywords": [
+        "SharedPreferences",
+        "shared_preferences",
+        "access_token",
+        "plaintext",
+        "flutter_secure_storage"
+      ]
+    },
+    {
+      "id": "F05",
+      "title": "The production API base URL is http:// (default in AppConfig and in config/prod.json), so bearer tokens and order data travel over cleartext HTTP; dart:io traffic is not blocked by Android or iOS cleartext policy, so the app must enforce HTTPS itself",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "app_config.dart",
+        "prod.json",
+        "api_client.dart"
+      ],
+      "keywords": [
+        "http://",
+        "cleartext",
+        "HTTPS",
+        "unencrypted",
+        "plain HTTP"
+      ]
+    },
+    {
+      "id": "F06",
+      "title": "HttpOverrides.global installs a client whose badCertificateCallback always returns true, disabling TLS certificate validation for every dart:io request (Dio, http, Image.network) in release builds, enabling man-in-the-middle attacks",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "http_overrides.dart",
+        "main.dart"
+      ],
+      "keywords": [
+        "badCertificateCallback",
+        "HttpOverrides",
+        "certificate validation",
+        "TLS",
+        "man-in-the-middle",
+        "MITM"
+      ]
+    },
+    {
+      "id": "F07",
+      "title": "Android network security config permits cleartext traffic for all domains (base-config cleartextTrafficPermitted=true), trusts user-added CAs in release, and the manifest sets android:usesCleartextTraffic=true",
+      "severity": [
+        "medium",
+        "high",
+        "low"
+      ],
+      "files": [
+        "network_security_config.xml",
+        "AndroidManifest.xml"
+      ],
+      "keywords": [
+        "cleartextTrafficPermitted",
+        "usesCleartextTraffic",
+        "user",
+        "trust-anchors",
+        "network security config"
+      ]
+    },
+    {
+      "id": "F08",
+      "title": "The Dio interceptor adds the Authorization bearer token to every request and ApiClient.downloadReceipt passes the server-supplied absolute receiptUrl to dio.download, which ignores baseUrl, so the access token is sent to whatever host the API response names. Order documents are writable by any signed-in user (F13), so an attacker can set receiptUrl to their own host",
+      "severity": [
+        "medium",
+        "high"
+      ],
+      "files": [
+        "api_client.dart"
+      ],
+      "keywords": [
+        "Authorization",
+        "receiptUrl",
+        "absolute URL",
+        "interceptor",
+        "other host",
+        "token leak",
+        "baseUrl"
+      ]
+    },
+    {
+      "id": "F09",
+      "title": "OAuth sign-in with flutter_appauth embeds a clientSecret in the public mobile client, uses an http:// issuer and sets allowInsecureConnections: true, which allows the token endpoint over cleartext",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "auth_service.dart",
+        "app_config.dart"
+      ],
+      "keywords": [
+        "clientSecret",
+        "allowInsecureConnections",
+        "public client",
+        "issuer",
+        "http://login"
+      ]
+    },
+    {
+      "id": "F10",
+      "title": "Refunds are authorised only by a local_auth biometric prompt returning a boolean (and then call the payment provider with an app-embedded secret key); there is no server-side authorisation or cryptographic binding, so the gate can be bypassed on a compromised device or by calling the API directly",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "biometric_gate.dart",
+        "order_detail_screen.dart",
+        "payment_service.dart"
+      ],
+      "keywords": [
+        "local_auth",
+        "biometric",
+        "client-side",
+        "server-side",
+        "refund",
+        "cryptographic",
+        "bypass"
+      ]
+    },
+    {
+      "id": "F11",
+      "title": "The admin area is protected only by a client-side go_router redirect that reads the role from the cached profile in shared_preferences (editable on the device); the admin API calls rely on the token and a static admin token with no visible server-side role check, so authorization is Likely missing on the server",
+      "severity": [
+        "high",
+        "critical",
+        "medium"
+      ],
+      "files": [
+        "app_router.dart",
+        "admin_screen.dart",
+        "session_cache.dart"
+      ],
+      "keywords": [
+        "client-side",
+        "role",
+        "admin",
+        "authorization",
+        "server-side",
+        "SharedPreferences",
+        "redirect"
+      ]
+    },
+    {
+      "id": "F12",
+      "title": "Firestore rules allow anyone, including unauthenticated users, to read and write all support_chats documents (allow read, write: if true)",
+      "severity": [
+        "critical",
+        "high"
+      ],
+      "files": [
+        "firestore.rules"
+      ],
+      "keywords": [
+        "support_chats",
+        "allow read, write: if true",
+        "open",
+        "unauthenticated",
+        "anyone"
+      ]
+    },
+    {
+      "id": "F13",
+      "title": "Firestore orders rule only requires request.auth != null, so any signed-in user can read and modify every customer's orders; the app's where('customerId') query is a client-side filter, not authorization",
+      "severity": [
+        "high",
+        "critical"
+      ],
+      "files": [
+        "firestore.rules",
+        "repositories.dart"
+      ],
+      "keywords": [
+        "orders",
+        "request.auth != null",
+        "any signed-in",
+        "any authenticated",
+        "ownership",
+        "customerId",
+        "not filters"
+      ]
+    },
+    {
+      "id": "F14",
+      "title": "Users can write their own users/{uid} document including the role field, and admin_settings rules trust that role via get(...).data.role == 'admin', so any user can make themselves admin (privilege escalation; use custom claims or a server-only role document)",
+      "severity": [
+        "high",
+        "critical"
+      ],
+      "files": [
+        "firestore.rules",
+        "repositories.dart"
+      ],
+      "keywords": [
+        "users",
+        "role",
+        "admin_settings",
+        "privilege escalation",
+        "self-writable",
+        "custom claims"
+      ]
+    },
+    {
+      "id": "F15",
+      "title": "The checkout WebView loads a URL taken from the deep link query parameter with unrestricted JavaScript and exposes an AcmeBridge JavaScript channel that returns the access token, opens URLs and writes files, so any page an attacker links to controls privileged app functions",
+      "severity": [
+        "high",
+        "critical"
+      ],
+      "files": [
+        "checkout_webview.dart",
+        "app_router.dart",
+        "deep_link_handler.dart"
+      ],
+      "keywords": [
+        "addJavaScriptChannel",
+        "AcmeBridge",
+        "JavaScript",
+        "loadRequest",
+        "untrusted",
+        "deep link",
+        "getToken"
+      ]
+    },
+    {
+      "id": "F16",
+      "title": "Deep link handling executes a refund immediately from acmeorders://refund?orderId=&amount= with no confirmation or authentication, accepts an unvalidated next route parameter, and the custom scheme and https intent filters are unverified (no autoVerify), so any app or web page can trigger actions",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "deep_link_handler.dart",
+        "AndroidManifest.xml"
+      ],
+      "keywords": [
+        "deep link",
+        "refund",
+        "confirmation",
+        "uriLinkStream",
+        "app_links",
+        "autoVerify",
+        "custom scheme",
+        "next"
+      ]
+    },
+    {
+      "id": "F17",
+      "title": "Sensitive data is logged in release builds: Dio LogInterceptor logs request and response bodies and per-request headers (such as X-Admin-Token), print() writes the access token, and debugPrint prints receipt contents, all visible in logcat and device logs",
+      "severity": [
+        "medium",
+        "low",
+        "high"
+      ],
+      "files": [
+        "api_client.dart",
+        "auth_service.dart",
+        "order_detail_screen.dart"
+      ],
+      "keywords": [
+        "LogInterceptor",
+        "print",
+        "token",
+        "logcat",
+        "debugPrint",
+        "release"
+      ]
+    },
+    {
+      "id": "F18",
+      "title": "Customer exports are encrypted with a hardcoded AES key and a static IV via the encrypt package using the default AES mode (SIC/CTR, unauthenticated), so the key ships in the app, the same IV is reused for every export, and ciphertexts are malleable",
+      "severity": [
+        "medium",
+        "high"
+      ],
+      "files": [
+        "export_cipher.dart"
+      ],
+      "keywords": [
+        "AES",
+        "hardcoded key",
+        "static IV",
+        "IV.fromUtf8",
+        "AESMode",
+        "encrypt"
+      ]
+    },
+    {
+      "id": "F19",
+      "title": "The main AndroidManifest sets android:debuggable=true on the application, so release builds are debuggable and app data and code can be accessed with adb run-as and a debugger",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "AndroidManifest.xml"
+      ],
+      "keywords": [
+        "android:debuggable",
+        "debuggable"
+      ]
+    },
+    {
+      "id": "F20",
+      "title": "The files MethodChannel handler builds paths from the unvalidated name argument (File(filesDir, \"receipts/$name\") and File(filesDir, name)), allowing path traversal to read or overwrite any file in the app's private directory; the name can come from the WebView bridge",
+      "severity": [
+        "high",
+        "medium"
+      ],
+      "files": [
+        "MainActivity.kt",
+        "native_bridge.dart",
+        "checkout_webview.dart"
+      ],
+      "keywords": [
+        "path traversal",
+        "MethodChannel",
+        "readReceipt",
+        "writeFile",
+        "filesDir",
+        "../"
+      ]
+    }
+  ],
+  "optional": [
+    {
+      "id": "O01",
+      "title": "Release signing credentials (storePassword and keyPassword) are hardcoded in build.gradle.kts next to the keystore path",
+      "files": [
+        "build.gradle.kts"
+      ],
+      "keywords": [
+        "storePassword",
+        "keyPassword",
+        "keystore",
+        "signing"
+      ]
+    },
+    {
+      "id": "O02",
+      "title": "iOS Info.plist sets NSAppTransportSecurity NSAllowsArbitraryLoads=true, disabling App Transport Security for native and WebView traffic",
+      "files": [
+        "Info.plist"
+      ],
+      "keywords": [
+        "NSAllowsArbitraryLoads",
+        "App Transport Security",
+        "ATS"
+      ]
+    },
+    {
+      "id": "O03",
+      "title": "Delivery addresses and customer phone numbers are cached in an unencrypted sqflite database",
+      "files": [
+        "local_db.dart"
+      ],
+      "keywords": [
+        "sqflite",
+        "unencrypted",
+        "plaintext",
+        "SQLCipher",
+        "customer_phone",
+        "PII"
+      ]
+    },
+    {
+      "id": "O04",
+      "title": "The handover code uses Random() rather than Random.secure(), so codes are predictable",
+      "files": [
+        "pairing_code.dart"
+      ],
+      "keywords": [
+        "Random()",
+        "Random.secure",
+        "predictable",
+        "insecure random"
+      ]
+    },
+    {
+      "id": "O05",
+      "title": "pubspec.lock pins shared_preferences_android 2.3.3, affected by GHSA-3hpf-ff72-j67p (unsafe deserialization of the preferences file; fixed in 2.3.4)",
+      "files": [
+        "pubspec.lock"
+      ],
+      "keywords": [
+        "GHSA-3hpf-ff72-j67p",
+        "shared_preferences_android",
+        "2.3.3",
+        "advisory"
+      ]
+    },
+    {
+      "id": "O06",
+      "title": "Firebase App Check is activated with AndroidDebugProvider and AppleDebugProvider unconditionally, so release builds get no genuine attestation (tokens are rejected once enforcement is on, or enforcement is left off)",
+      "files": [
+        "main.dart"
+      ],
+      "keywords": [
+        "App Check",
+        "AndroidDebugProvider",
+        "AppleDebugProvider",
+        "debug provider"
+      ]
+    },
+    {
+      "id": "O07",
+      "title": "The manifest leaves android:allowBackup at its default (true) with no dataExtractionRules or fullBackupContent while tokens and PII sit in plaintext stores",
+      "files": [
+        "AndroidManifest.xml"
+      ],
+      "keywords": [
+        "allowBackup",
+        "dataExtractionRules",
+        "backup"
+      ]
+    },
+    {
+      "id": "O08",
+      "title": "signOut() clears secure storage, the prefs cache and Firebase auth but leaves the orders.db PII cache, draft_* preferences and the encrypted export file",
+      "files": [
+        "auth_service.dart"
+      ],
+      "keywords": [
+        "signOut",
+        "logout",
+        "sign out",
+        "orders.db"
+      ]
+    },
+    {
+      "id": "O09",
+      "title": "Login screen shows the raw exception text to the user ('Sign-in failed: $e')",
+      "files": [
+        "login_screen.dart"
+      ],
+      "keywords": [
+        "Sign-in failed",
+        "exception",
+        "error message"
+      ]
+    }
+  ],
+  "traps": [
+    {
+      "id": "T01",
+      "title": "firebase_options.dart contains Firebase API keys and app IDs, which are public by design and protected by Security Rules and App Check",
+      "files": [
+        "firebase_options.dart"
+      ],
+      "keywords": [
+        "AIzaSy",
+        "firebase_options",
+        "Firebase API key",
+        "public by design"
+      ]
+    },
+    {
+      "id": "T02",
+      "title": "The Supabase publishable key (sb_publishable_...) in AppConfig is meant to be shipped in the client; access is controlled by RLS on the server",
+      "files": [
+        "app_config.dart",
+        "main.dart"
+      ],
+      "keywords": [
+        "sb_publishable",
+        "supabasePublishableKey",
+        "Supabase publishable",
+        "publishable key"
+      ]
+    },
+    {
+      "id": "T03",
+      "title": "SecureSession stores the OAuth refresh token and the cache key in flutter_secure_storage with first_unlock_this_device accessibility",
+      "files": [
+        "secure_session.dart"
+      ],
+      "keywords": [
+        "flutter_secure_storage",
+        "SecureSession",
+        "first_unlock_this_device",
+        "refresh_token"
+      ]
+    },
+    {
+      "id": "T04",
+      "title": "HelpScreen loads only the constant first-party https://help.acme-orders.example URL and a NavigationDelegate allow-list blocks every other host",
+      "files": [
+        "help_screen.dart"
+      ],
+      "keywords": [
+        "HelpScreen",
+        "help.acme-orders.example",
+        "supportUrl",
+        "help centre"
+      ]
+    },
+    {
+      "id": "T05",
+      "title": "logDebug writes with debugPrint only inside kDebugMode, so nothing is logged in release builds",
+      "files": [
+        "logger.dart"
+      ],
+      "keywords": [
+        "logDebug",
+        "kDebugMode",
+        "logger.dart"
+      ]
+    },
+    {
+      "id": "T06",
+      "title": "The telemetry Dio client uses the documented pinning pattern: a SecurityContext without trusted roots, a permissive badCertificateCallback and validateCertificate comparing the leaf SHA-256 to a pinned value (not an unconditional-trust finding; an Informational note that validateCertificate runs after the request is sent is acceptable)",
+      "files": [
+        "telemetry_client.dart"
+      ],
+      "keywords": [
+        "telemetry",
+        "validateCertificate",
+        "withTrustedRoots",
+        "pinned",
+        "fingerprint"
+      ]
+    },
+    {
+      "id": "T07",
+      "title": "The products rule (public read, writes restricted to the admin custom claim) and the profiles rule (owner only, update limited with affectedKeys().hasOnly) are correct",
+      "files": [
+        "firestore.rules"
+      ],
+      "keywords": [
+        "products",
+        "profiles",
+        "affectedKeys",
+        "request.auth.token.admin"
+      ]
+    },
+    {
+      "id": "T08",
+      "title": "The cleartext network config in src/debug only allows 10.0.2.2 and localhost for debug builds and is not part of release builds",
+      "files": [
+        "debug_network_config.xml"
+      ],
+      "keywords": [
+        "10.0.2.2",
+        "debug_network_config",
+        "debug-only",
+        "localhost"
+      ]
+    },
+    {
+      "id": "T09",
+      "title": "MainActivity is exported only because it is the launcher, and AppAuth's RedirectUriReceiverActivity must be exported for the OAuth redirect (reverse-DNS scheme)",
+      "files": [
+        "AndroidManifest.xml"
+      ],
+      "keywords": [
+        "RedirectUriReceiverActivity",
+        "MainActivity",
+        "LAUNCHER",
+        "launcher activity"
+      ]
+    },
+    {
+      "id": "T10",
+      "title": "The absence of root or jailbreak detection, certificate pinning on the main API, tamper detection and anti-debugging is not a vulnerability by itself",
+      "files": [
+        "main.dart",
+        "api_client.dart"
+      ],
+      "keywords": [
+        "root detection",
+        "jailbreak",
+        "certificate pinning",
+        "tamper detection",
+        "anti-debugging"
+      ]
+    },
+    {
+      "id": "T11",
+      "title": "SettingsStore keeps only theme_mode and onboarding_done in shared_preferences, which are non-sensitive preferences",
+      "files": [
+        "settings_store.dart"
+      ],
+      "keywords": [
+        "settings_store",
+        "SettingsStore",
+        "theme_mode",
+        "onboarding_done"
+      ]
+    },
+    {
+      "id": "T12",
+      "title": "parseOrderLink extracts an id with int.tryParse and the /orders/:id route redirects unparseable shapes to /orders: no injection sink (at most a Low hardening note)",
+      "files": [
+        "app_router.dart"
+      ],
+      "keywords": [
+        "parseOrderLink",
+        "int.tryParse",
+        "orders/:id"
+      ]
+    },
+    {
+      "id": "T13",
+      "title": "CacheCipher encrypts drafts with AES-GCM, a fresh IV from IV.fromSecureRandom and a per-install key generated with Random.secure() stored in flutter_secure_storage",
+      "files": [
+        "cache_cipher.dart",
+        "draft_store.dart"
+      ],
+      "keywords": [
+        "CacheCipher",
+        "cache_cipher",
+        "AESMode.gcm",
+        "fromSecureRandom",
+        "Random.secure"
+      ]
+    },
+    {
+      "id": "T14",
+      "title": "INTERNET and USE_BIOMETRIC permissions, <queries> entries and LSApplicationQueriesSchemes are normal declarations",
+      "files": [
+        "AndroidManifest.xml",
+        "Info.plist"
+      ],
+      "keywords": [
+        "USE_BIOMETRIC",
+        "<queries>",
+        "LSApplicationQueriesSchemes"
+      ]
+    },
+    {
+      "id": "T15",
+      "title": ".env.example contains placeholder names only",
+      "files": [
+        ".env.example"
+      ],
+      "keywords": [
+        ".env.example"
+      ]
+    }
+  ]
+}

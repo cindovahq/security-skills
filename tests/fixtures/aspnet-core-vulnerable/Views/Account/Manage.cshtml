@@ -1,0 +1,23 @@
+@model PortalUser
+@{
+    ViewData["Title"] = "Account settings";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@if (TempData["Status"] is string status)
+{
+    <div class="alert alert-info">@status</div>
+}
+
+<p>Signed in as <strong>@Model.Email</strong></p>
+
+<form asp-action="ChangeEmail" method="post">
+    <label for="newEmail">New email address</label>
+    <input id="newEmail" name="newEmail" type="email" class="form-control" required />
+    <button type="submit" class="btn btn-primary">Change email</button>
+</form>
+
+<form asp-action="Logout" method="post">
+    <button type="submit" class="btn btn-link">Sign out</button>
+</form>

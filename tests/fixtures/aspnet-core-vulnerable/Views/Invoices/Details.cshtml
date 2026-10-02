@@ -1,0 +1,21 @@
+@model Invoice
+@{
+    ViewData["Title"] = $"Invoice {Model.Number}";
+}
+
+<h1>Invoice @Model.Number</h1>
+<p>Status: @Model.Status · Issued @Model.IssuedOn.ToString("d")</p>
+<address>@Model.BillingAddress</address>
+
+<table class="table">
+    <thead><tr><th>Item</th><th>Qty</th><th>Unit price</th></tr></thead>
+    <tbody>
+    @foreach (var line in Model.Lines)
+    {
+        <tr><td>@line.Description</td><td>@line.Quantity</td><td>@line.UnitPrice.ToString("C")</td></tr>
+    }
+    </tbody>
+</table>
+
+<p class="total">Total: @Model.Total.ToString("C")</p>
+<a asp-action="Pdf" asp-route-id="@Model.Id">Download PDF</a>

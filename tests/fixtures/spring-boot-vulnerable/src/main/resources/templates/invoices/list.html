@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head><meta charset="UTF-8"><title>Invoices</title></head>
+<body>
+<table>
+    <tr><th>Number</th><th>Customer</th><th>Amount</th><th>Due</th><th>Status</th></tr>
+    <tr th:each="invoice : ${invoices}">
+        <td><a th:href="@{/invoices/{id}(id=${invoice.id})}" th:text="${invoice.number}">INV-1</a></td>
+        <td th:text="${invoice.customer?.name}">Customer</td>
+        <td th:text="${invoice.amount}">0.00</td>
+        <td th:text="${invoice.dueDate}">2026-01-01</td>
+        <td th:text="${invoice.status}">OPEN</td>
+    </tr>
+</table>
+<form th:action="@{/invoices/import}" method="post" enctype="multipart/form-data">
+    <input type="file" name="file" accept=".xml">
+    <button type="submit">Import XML</button>
+</form>
+</body>
+</html>

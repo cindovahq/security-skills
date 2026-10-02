@@ -10,9 +10,12 @@
 | `fixtures/wordpress-vulnerable` | `wordpress-security` (+ `appsec-review`) | 21 (+3 optional) | 12 |
 | `fixtures/nextjs-vulnerable` | `nextjs-security` (+ `appsec-review`) | 21 (+5 optional) | 12 |
 | `fixtures/supabase-vulnerable` | `supabase-security` (+ `appsec-review`) | 20 (+7 optional) | 12 |
-| `fixtures/nestjs-vulnerable` | `nestjs-security` (+ `appsec-review`) | 22 (+7 optional) | 13 |
+| `fixtures/nestjs-vulnerable` | `nestjs-security` (+ `appsec-review`) | 22 (+7 optional) | 15 |
 | `fixtures/react-vulnerable` | `react-security` (+ `appsec-review`) | 19 (+6 optional) | 14 |
 | `fixtures/django-vulnerable` | `django-security` (+ `appsec-review`) | 23 (+7 optional) | 12 |
+| `fixtures/spring-boot-vulnerable` | `spring-boot-security` (+ `appsec-review`) | 22 (+7 optional) | 15 |
+| `fixtures/aspnet-core-vulnerable` | `aspnet-core-security` (+ `appsec-review`) | 23 (+7 optional) | 13 |
+| `fixtures/flutter-vulnerable` | `flutter-security` (+ `appsec-review`) | 20 (+9 optional) | 15 |
 
 Each fixture contains a minimal, realistic app skeleton, a `FIXTURE-NOTICE.md` warning (the only place the code is labeled as insecure), and `expected-findings.json`:
 
@@ -53,6 +56,9 @@ Record results here when skills change, so regressions are visible.
 | 2026-10-02 | nestjs-security 1.0.0, appsec-review 1.0.0 | Claude Code 2.1.287 (Sonnet 5.5), `run-eval.mjs` | 22/22 | 0/13 | All severities within range; 7/7 optional findings reported. |
 | 2026-10-02 | react-security 1.0.0, appsec-review 1.0.0 | Claude Code 2.1.287 (Sonnet 5.5), `run-eval.mjs` | 19/19 | 0/14 | All severities within range. Two scorer trap flags (T02, T11) were false alarms: the safe helpers were cited only as the fix. Found a valid unplanted issue (OAuth callback without `state`), now O06. |
 | 2026-10-02 | django-security 1.0.0, appsec-review 1.0.0 | Claude Code 2.1.287 (Sonnet 5.5), `run-eval.mjs` | 23/23 | 0/12 | First run rated comment `\|safe` XSS Low (correct: the fixture made it self-XSS) and CSRF on email change Low. The fixture now lets staff view all tickets, and `SKILL.md` calibrates email-change CSRF as High; the rerun put both in range. Scorer flag T03 was a false alarm (the word "dashboard" in a different finding's heading). |
+| 2026-10-02 | spring-boot-security 1.0.0, appsec-review 1.0.0 | Claude Code 2.1.287 (Sonnet 5.5), `run-eval.mjs` | 22/22 | 0/15 | First run rated the outdated Boot 3.5.9 stack Low; `SKILL.md` now maps BOM-managed versions to the advisory table, and the rerun rated it High. Scorer flag T01 was a false alarm ("CSRF" in the CORS finding's heading). |
+| 2026-10-02 | aspnet-core-security 1.0.0, appsec-review 1.0.0 | Claude Code 2.1.287 (Sonnet 5.5), `run-eval.mjs` | 23/23 | 0/13 | All severities within range. Scorer flag T12 was a Low hardening note that explicitly confirmed the HMAC check is correct (replay protection, missing-secret handling). |
+| 2026-10-02 | flutter-security 1.0.0, appsec-review 1.0.0 | Claude Code 2.1.287 (Sonnet 5.5), `run-eval.mjs` | 20/20 | 0/15 | First run correctly rated the token-to-any-host issue Low because the fixture never passed the order to the detail screen; the fixture now does, and the rerun rated it High. Found valid unplanted issues (logout leaves PII caches, raw exception shown at login), now O08 and O09. |
 
 ## Adding a fixture
 

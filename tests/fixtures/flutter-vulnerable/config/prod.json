@@ -1,0 +1,6 @@
+{
+  "FLAVOR": "prod",
+  "API_BASE_URL": "http://api.acme-orders.example/v2",
+  "ADMIN_API_TOKEN": "acme-admin-FAKE-prod-0000-0000",
+  "PAYMENTS_SECRET_KEY": "pay_secret_FAKE_prod_000000000000"
+}

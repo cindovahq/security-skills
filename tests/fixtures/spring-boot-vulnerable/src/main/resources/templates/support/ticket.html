@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Support ticket</title>
+</head>
+<body>
+<h1 th:text="${ticket.subject}">Subject</h1>
+<p>Opened by <span th:text="${ticket.author}">author</span> on <span th:text="${ticket.createdAt}">date</span></p>
+<p>Status: <strong th:text="${ticket.status}">OPEN</strong></p>
+<article class="ticket-body" th:utext="${ticket.body}">Body</article>
+<aside th:if="${staff}">
+    <h2>Internal note</h2>
+    <p th:text="${ticket.internalNote}">note</p>
+</aside>
+<form th:action="@{/support/tickets/{id}/attachments(id=${ticket.id})}" method="post" enctype="multipart/form-data">
+    <input type="file" name="file">
+    <button type="submit">Attach</button>
+</form>
+</body>
+</html>

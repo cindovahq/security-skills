@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/portal.css}">
+</head>
+<body>
+<h1 th:text="|Welcome, ${user.displayName}|">Welcome</h1>
+<section>
+    <h2>Recent invoices</h2>
+    <table>
+        <tr><th>Number</th><th>Amount</th><th>Status</th></tr>
+        <tr th:each="invoice : ${invoices}">
+            <td><a th:href="@{/invoices/{id}(id=${invoice.id})}" th:text="${invoice.number}">INV-1</a></td>
+            <td th:text="${invoice.amount}">0.00</td>
+            <td th:text="${invoice.status}">OPEN</td>
+        </tr>
+    </table>
+</section>
+<form th:action="@{/account/preferences}" method="post">
+    <select name="layout">
+        <option value="default">Default</option>
+        <option value="compact">Compact</option>
+    </select>
+    <button type="submit">Save layout</button>
+</form>
+</body>
+</html>

@@ -53,9 +53,9 @@ Use a framework skill when it's installed. Otherwise fall back to this skill's b
 | NestJS | `nestjs-security` | available |
 | React | `react-security` | available |
 | Django | `django-security` | available |
-| Spring Boot | `spring-boot-security` | planned |
-| ASP.NET Core | `aspnet-core-security` | planned |
-| Flutter | `flutter-security` | planned |
+| Spring Boot | `spring-boot-security` | available |
+| ASP.NET Core | `aspnet-core-security` | available |
+| Flutter | `flutter-security` | available |
 
 To check what's installed, look in the agent's skills directories (project or home: `.agents/skills/`, `.claude/skills/`, `.kiro/skills/`, `.github/skills/`, `.cursor/skills/`, `.cline/skills/`, `.junie/skills/`, `~/.gemini/config/skills/`) or the agent's skill list.
 

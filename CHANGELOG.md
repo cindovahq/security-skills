@@ -4,6 +4,17 @@ All notable changes to this project are documented here. The format is based on 
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-10-02
+
+### Added
+- `spring-boot-security` skill (Spring Boot 3.x–4.x, Spring Security 6.5–7.x): filter chains and request matchers, authorization and method security, authentication, sessions, CSRF/CORS, API security and Spring Data REST, validation and mass assignment, injection (SQL, JPQL, SpEL), templates and XSS/SSTI, deserialization and XXE, SSRF and redirects, file uploads, Actuator and configuration, dependencies, verification. Includes a vulnerable Spring Boot fixture.
+- `aspnet-core-security` skill (ASP.NET Core on .NET 8–10): authentication, JWT bearer, authorization, sessions and Data Protection, CSRF, model binding, injection and deserialization, XSS, SSRF and redirects, file uploads, secrets and configuration, API security (SignalR, gRPC, rate limiting, OpenAPI), Blazor, dependencies, verification. Includes a vulnerable ASP.NET Core fixture.
+- `flutter-security` skill (Flutter 3.x, Dart 3.x): secrets in the binary, local storage, network and TLS, authentication, authorization and backend rules, deep links, WebViews, platform channels and native code, platform configuration, logging and privacy, resilience and dynamic code, dependencies, Flutter web, verification. Includes a vulnerable Flutter fixture.
+
+### Changed
+- `appsec-review` stack routing now points to the Spring Boot, ASP.NET Core and Flutter skills.
+- Fixture `.env` files are no longer git-ignored, so fixtures that plant secrets in `.env` work from a clone.
+
 ## [1.3.0] - 2026-10-02
 
 ### Added
