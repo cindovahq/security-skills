@@ -9,6 +9,8 @@ import { join, resolve, dirname } from 'node:path';
 import { PassThrough } from 'node:stream';
 import { fileURLToPath } from 'node:url';
 import { BANNER_WIDTH, BIG_LINES, SMALL_LINES, banner } from '../bin/banner.mjs';
+import { createProgress, renderBar } from '../bin/progress.mjs';
+import { theme } from '../bin/theme.mjs';
 import { detectAgents, detectStack } from '../bin/detect.mjs';
 import { Cancelled, select } from '../bin/prompt.mjs';
 
@@ -29,7 +31,8 @@ test('banner: CINDOVA large, SECURITY SKILLS smaller, both fit in 80 columns', (
   assert.equal(SMALL_LINES.length, 3);
   assert.ok(BANNER_WIDTH <= 78, `banner is ${BANNER_WIDTH} columns wide`);
   const plain = banner({ columns: 100, color: false });
-  assert.match(plain, /██████╗██╗███╗/); // C I N
+  assert.match(plain, /╚═██╔═╝/, 'the I has serifs so it does not read as a lowercase l');
+  assert.ok(BIG_LINES[0].includes('██████╗ ██████╗') && BIG_LINES[4].includes('██████╗ ██████╗'), 'top and bottom serifs next to the C');
   assert.match(plain, /╔═╗╔═╗╔═╗╦ ╦╦═╗/); // S E C U R
   assert.doesNotMatch(plain, /\x1b\[/, 'no ANSI codes when color is off');
   for (const line of plain.split('\n')) assert.ok(line.length <= 80, `line too wide: ${line.length}`);
@@ -47,7 +50,10 @@ test('banner: narrow terminals get a plain-text header; colors only when asked',
   assert.match(narrow, /CINDOVA/);
   assert.match(narrow, /Security Skills/);
   assert.doesNotMatch(narrow, /[█╗╔]/);
-  assert.match(banner({ columns: 100, color: true }), /\x1b\[96m█/);
+  const orange = banner({ columns: 100, color: true, env: { TERM: 'xterm-256color' } });
+  assert.match(orange, /\x1b\[1;38;5;208m█/, 'orange blocks on 256-color terminals');
+  assert.match(orange, /\x1b\[38;5;166m╗/, 'darker orange shadow');
+  assert.match(banner({ columns: 100, color: true, env: { TERM: 'dumb' } }), /\x1b\[1;91m█/, 'red on 8/16-color terminals');
 });
 
 // ---------- detection ----------
@@ -265,4 +271,89 @@ test('--dry-run through --yes writes nothing', () => {
   const dir = tmp();
   run(['install', '--yes', '--dry-run', '--dir', dir]);
   assert.deepEqual(readdirSync(dir), []);
+});
+
+// ---------- theme, progress bar, summary ----------
+
+test('theme: orange accent, red fallback, and no color for pipes or NO_COLOR', () => {
+  const tty = { isTTY: true };
+  assert.equal(theme({ stream: tty, env: { TERM: 'xterm-256color' } }).accent('x'), '\x1b[38;5;208mx\x1b[0m');
+  assert.equal(theme({ stream: tty, env: { TERM: 'dumb' } }).accent('x'), '\x1b[91mx\x1b[0m');
+  assert.equal(theme({ stream: { isTTY: false }, env: {} }).accentBold('x'), 'x');
+  assert.equal(theme({ stream: tty, env: { NO_COLOR: '1', TERM: 'xterm-256color' } }).bold('x'), 'x');
+});
+
+test('renderBar: fixed width, fills with the percentage, label is trimmed to the terminal', () => {
+  const plain = (pct, o = {}) => renderBar(pct, { width: 20, ...o });
+  assert.match(plain(0), /░{20}\s+0%/);
+  assert.match(plain(50), /█{10}░{10}\s+50%/);
+  assert.match(plain(100), /█{20}\s+100%/);
+  assert.equal(plain(0).length, plain(100).length - 0, 'bar does not change width');
+  const long = renderBar(40, { width: 20, label: 'x'.repeat(200), columns: 70 });
+  assert.ok(long.length <= 70, `line is ${long.length} columns`);
+  assert.equal(renderBar(250, { width: 10 }).includes('100%'), true, 'clamped to 100');
+});
+
+test('createProgress counts up to 100% and restores the cursor', async () => {
+  const output = new PassThrough();
+  output.columns = 100;
+  let text = '';
+  output.on('data', (d) => (text += d));
+  const progress = createProgress({ total: 250, output, frameMs: 0 });
+  progress.start();
+  for (let i = 0; i < 250; i++) await progress.tick(`file ${i}`);
+  await progress.finish();
+  const percents = [...text.matchAll(/\s(\d{1,3})%/g)].map((m) => Number(m[1]));
+  assert.equal(percents[0], 0);
+  assert.equal(percents.at(-1), 100);
+  assert.deepEqual(percents, [...percents].sort((a, b) => a - b), 'never goes backwards');
+  assert.equal(new Set(percents).size, 101, 'every whole percent from 0 to 100 is shown');
+  assert.ok(text.indexOf('\x1b[?25l') < text.lastIndexOf('\x1b[?25h'), 'cursor hidden then shown');
+  assert.ok(text.endsWith('\x1b[?25h'));
+});
+
+test('createProgress: a handful of steps still reaches 100%', async () => {
+  const output = new PassThrough();
+  let text = '';
+  output.on('data', (d) => (text += d));
+  const progress = createProgress({ total: 3, output, frameMs: 0 });
+  progress.start();
+  await progress.tick();
+  await progress.tick();
+  await progress.finish();
+  assert.match(text, /100%/);
+  assert.match(text, /\s33%/);
+});
+
+test('install prints a highlighted-style summary (plain when piped) with counts and locations', () => {
+  const dir = tmp();
+  write(dir, 'package.json', JSON.stringify({ dependencies: { next: '15' } }));
+  const out = run(['install', '--agent', 'claude,kiro', '--skill', 'auto', '--dir', dir]);
+  assert.doesNotMatch(out, /\x1b\[/, 'no color codes when piped');
+  assert.doesNotMatch(out, /Installing\s+[█░]/, 'no progress bar when piped');
+  assert.match(out, /Installation complete/);
+  assert.match(out, /Skills\s+2 installed\s+appsec-review, nextjs-security/);
+  assert.match(out, /Agents\s+Claude Code, Kiro/);
+  assert.match(out, /Location\s+\.claude\/skills, \.kiro\/skills/);
+  const files = readdirSync(join(dir, '.claude/skills/nextjs-security'), { recursive: true }).filter((f) => /\.\w+$/.test(f)).length;
+  const kiroFiles = readdirSync(join(dir, '.kiro/skills/nextjs-security'), { recursive: true }).filter((f) => /\.\w+$/.test(f)).length;
+  assert.equal(files, kiroFiles);
+  assert.ok(existsSync(join(dir, '.kiro/skills/appsec-review/SKILL.md')));
+  const copied = Number(out.match(/Files\s+(\d+) copied/)[1]);
+  assert.ok(copied > 20, `copied ${copied} files`);
+});
+
+test('summary reports a dry run honestly and counts skipped foreign skills', () => {
+  const dir = tmp();
+  const dry = run(['install', '--agent', 'claude', '--skill', 'laravel-security', '--dry-run', '--dir', dir]);
+  assert.match(dry, /Dry run complete\. Nothing was written\./);
+  assert.match(dry, /Skills\s+1 would be installed/);
+  assert.deepEqual(readdirSync(dir), []);
+
+  const foreign = join(dir, '.claude/skills/laravel-security');
+  mkdirSync(foreign, { recursive: true });
+  writeFileSync(join(foreign, 'SKILL.md'), '---\nname: laravel-security\ndescription: mine\n---\n');
+  const out = run(['install', '--agent', 'claude', '--skill', 'laravel-security', '--dir', dir]);
+  assert.match(out, /Skipped\s+1 existing skill folder/);
+  assert.match(readFileSync(join(foreign, 'SKILL.md'), 'utf8'), /description: mine/);
 });

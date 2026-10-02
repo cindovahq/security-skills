@@ -75,7 +75,7 @@ npx github:cindovahq/security-skills detect
 npx github:cindovahq/security-skills list
 ```
 
-The guided installer asks where to install (this project or global), which agents or IDEs you use, and which skills. It reads `package.json`, `composer.json`, `requirements.txt`, `pom.xml`, `*.csproj`, `pubspec.yaml`, `wp-config.php` and similar files (up to two folders deep, so monorepos work) to pre-select the matching framework skills, and it pre-selects agents already configured in the project. It only reads files and never sends anything anywhere. Ctrl+C cancels without changes.
+The guided installer asks where to install (this project or global), which agents or IDEs you use, and which skills, then shows a progress bar and a summary of what was installed. It reads `package.json`, `composer.json`, `requirements.txt`, `pom.xml`, `*.csproj`, `pubspec.yaml`, `wp-config.php` and similar files (up to two folders deep, so monorepos work) to pre-select the matching framework skills, and it pre-selects agents already configured in the project. It only reads files and never sends anything anywhere. Ctrl+C cancels without changes.
 
 The `agents` target writes to `.agents/skills`, the shared folder read by **Codex, GitHub Copilot, Cursor, Gemini CLI, Google Antigravity, Windsurf/Devin, JetBrains Junie and OpenCode**. `claude`, `kiro` and `cline` have their own folders. `--agent all` covers all of them.
 

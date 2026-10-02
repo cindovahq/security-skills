@@ -1,6 +1,6 @@
 {
   "name": "@cindova/security-skills",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Framework-aware security skills for AI coding agents (Claude Code, GitHub Copilot, Kiro, Cursor, Codex, Antigravity, Gemini CLI, Junie, Windsurf/Devin and more).",
   "type": "module",
   "bin": {

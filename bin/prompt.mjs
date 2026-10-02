@@ -6,6 +6,7 @@
 
 import readline from 'node:readline';
 import { createInterface } from 'node:readline/promises';
+import { accentCodes } from './theme.mjs';
 
 export class Cancelled extends Error {
   constructor() {
@@ -22,7 +23,7 @@ const ANSI = /\x1b\[[0-9;?]*[A-Za-z]/g;
 const style = (on) => ({
   bold: (s) => (on ? `${CSI}1m${s}${CSI}0m` : s),
   dim: (s) => (on ? `${CSI}2m${s}${CSI}0m` : s),
-  cyan: (s) => (on ? `${CSI}36m${s}${CSI}0m` : s),
+  cyan: (s) => (on ? `${CSI}${accentCodes().fill}m${s}${CSI}0m` : s),
   green: (s) => (on ? `${CSI}32m${s}${CSI}0m` : s),
   yellow: (s) => (on ? `${CSI}33m${s}${CSI}0m` : s),
 });

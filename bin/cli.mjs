@@ -10,13 +10,15 @@
 //   npx github:cindovahq/security-skills list
 //   npx github:cindovahq/security-skills uninstall --agent kiro --global
 
-import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { basename, dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { banner } from './banner.mjs';
 import { STACKS, detectAgents, detectStack } from './detect.mjs';
+import { createProgress } from './progress.mjs';
 import { Cancelled, select } from './prompt.mjs';
+import { theme } from './theme.mjs';
 
 const PKG_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const SKILLS_SRC = join(PKG_ROOT, 'skills');
@@ -53,12 +55,10 @@ const MENU_LABEL = { agents: 'Any other agent (shared .agents/skills folder)' };
 
 // ---------- helpers ----------
 
-const useColor = () => Boolean(process.stdout.isTTY && !process.env.NO_COLOR);
-const color = (code) => (s) => (useColor() ? `\x1b[${code}m${s}\x1b[0m` : s);
-const bold = color('1');
-const dim = color('2');
-const green = color('32');
-const red = color('31');
+const T = theme();
+const useColor = () => T.on;
+const { bold, dim, green, red, yellow } = T;
+const hi = T.accentBold; // highlighted values in summaries
 
 function die(msg) {
   console.error(red(`error: ${msg}`));
@@ -265,34 +265,92 @@ async function install(opts) {
     plan = { agentIds: resolveAgents(ids), skills: selectSkills(expandAuto(requested)), global: opts.global };
   }
 
-  const { agentIds, skills, global } = plan;
-  const dirs = targetDirs(agentIds, { ...opts, global });
-  console.log(bold(`\nInstalling ${skills.length} skill(s) ${global ? 'globally' : `into ${pretty(opts.dir)}`}${opts.dryRun ? ' (dry run)' : ''}`));
-  for (const [dir, ids] of dirs) {
+  const result = await copySkills(plan, opts);
+  summary(result, plan, opts);
+  nextSteps(plan.agentIds, plan.skills, opts);
+}
+
+function listFiles(dir, base = dir) {
+  const out = [];
+  for (const e of readdirSync(dir, { withFileTypes: true })) {
+    if (JUNK.has(e.name)) continue;
+    const full = join(dir, e.name);
+    if (e.isDirectory()) out.push(...listFiles(full, base));
+    else out.push(relative(base, full));
+  }
+  return out;
+}
+
+// Copies file by file so the progress bar can count 0 to 100%. On a terminal each visible step
+// is paced by a few milliseconds, because a local copy would otherwise finish before it can be seen.
+async function copySkills({ agentIds, skills, global }, opts) {
+  const started = Date.now();
+  const shown = (p) => (global ? pretty(p) : relative(opts.dir, p) || '.'); // relative to the project, not to where you ran the command
+  const jobs = [];
+  const skipped = [];
+  for (const [dir, ids] of targetDirs(agentIds, { ...opts, global })) {
     for (const skill of skills) {
       const dest = join(dir, skill.name);
-      if (existsSync(dest) && !isOurs(dest)) {
-        console.log(red(`  skip ${dest} (exists and was not installed by ${AUTHOR})`));
-        continue;
-      }
-      if (!opts.dryRun) {
-        rmSync(dest, { recursive: true, force: true });
-        mkdirSync(dir, { recursive: true });
-        copySkill(skill.dir, dest);
-      }
-      console.log(`  ${green('✓')} ${skill.name} ${dim(`v${skill.version}`)} → ${displayPath(dest)} ${dim(`(${ids.join(', ')})`)}`);
+      if (existsSync(dest) && !isOurs(dest)) skipped.push(dest);
+      else jobs.push({ dir, ids, skill, dest, files: listFiles(skill.dir) });
     }
   }
-  nextSteps(agentIds, skills, opts);
+  const animate = process.stdout.isTTY === true;
+  console.log(`${bold('\nInstalling')} ${hi(skills.length)} ${bold(`skill${skills.length === 1 ? '' : 's'}`)} ${global ? bold('globally') : `${bold('into')} ${pretty(opts.dir)}`}${opts.dryRun ? yellow(' (dry run)') : ''}`);
+  const progress = animate ? createProgress({ total: jobs.reduce((n, j) => n + j.files.length, 0), t: T }) : null;
+  progress?.start();
+  let files = 0;
+  try {
+    for (const job of jobs) {
+      if (!opts.dryRun) {
+        rmSync(job.dest, { recursive: true, force: true });
+        mkdirSync(job.dir, { recursive: true });
+      }
+      for (const rel of job.files) {
+        if (!opts.dryRun) {
+          const to = join(job.dest, rel);
+          mkdirSync(dirname(to), { recursive: true });
+          copyFileSync(join(job.skill.dir, rel), to);
+        }
+        files++;
+        await progress?.tick(`${job.skill.name} → ${shown(job.dir)}`);
+      }
+      if (!animate) console.log(`  ${green('✓')} ${job.skill.name} ${dim(`v${job.skill.version}`)} → ${shown(job.dest)} ${dim(`(${job.ids.join(', ')})`)}`);
+    }
+    await progress?.finish();
+  } catch (err) {
+    progress?.abort();
+    throw err;
+  }
+  for (const dest of skipped) console.log(red(`  skip ${dest} (exists and was not installed by ${AUTHOR})`));
+  return { jobs, skipped, files, ms: Date.now() - started, shown };
+}
+
+const shortLabel = (id) => (MENU_LABEL[id] ?? AGENTS[id].label).replace(/ \(.*$/, '');
+
+function summary({ jobs, skipped, files, ms, shown }, plan, opts) {
+  const names = [...new Set(jobs.map((j) => j.skill.name))];
+  const where = [...new Set(jobs.map((j) => shown(j.dir)))];
+  const row = (label, value) => console.log(`  ${dim(label.padEnd(9))} ${value}`);
+  const rule = T.accentDim('━'.repeat(62));
+  console.log(`\n${rule}`);
+  console.log(opts.dryRun ? `  ${yellow('●')} ${bold('Dry run complete.')} ${hi('Nothing was written.')}` : `  ${green('✔')} ${bold('Installation complete')} ${dim(`in ${(ms / 1000).toFixed(1)}s`)}`);
+  console.log(rule);
+  row('Skills', `${hi(names.length)} ${opts.dryRun ? 'would be installed' : 'installed'}  ${names.map((n) => bold(n)).join(dim(', '))}`);
+  row('Agents', plan.agentIds.map((id) => hi(shortLabel(id))).join(dim(', ')));
+  row('Location', where.map((w) => bold(w)).join(dim(', ')));
+  row('Files', `${hi(files)} ${opts.dryRun ? 'would be copied' : 'copied'}`);
+  if (skipped.length) row('Skipped', `${red(String(skipped.length))} ${red(`existing skill folder(s) not installed by ${AUTHOR}`)}`);
+  console.log(rule);
 }
 
 function nextSteps(agentIds, skills, opts) {
   const framework = skills.filter((s) => s.name !== 'appsec-review').map((s) => s.name);
-  const via = framework.length ? ` It will use ${framework.slice(0, 3).join(', ')}${framework.length > 3 ? ' and more' : ''}.` : '';
+  const via = framework.length ? ` It will use ${framework.slice(0, 3).map((n) => hi(n)).join(', ')}${framework.length > 3 ? ' and more' : ''}.` : '';
   console.log(`\n${bold('Next steps')}`);
-  console.log(`  1. Open this ${opts.global ? 'any project' : 'project'} in your agent${agentIds.length === 1 ? ` (${AGENTS[agentIds[0]].label})` : ''}. If it was already open, start a new session so it reloads skills.`);
-  console.log(`  2. Ask: ${bold('"Do a security review of this project"')}.${via}`);
-  console.log(`  3. Or invoke a skill by name, e.g. ${bold(`/${framework[0] ?? 'appsec-review'}`)}.`);
+  console.log(`  ${hi('1.')} Open ${opts.global ? 'any project' : 'this project'} in your agent${agentIds.length === 1 ? ` (${hi(shortLabel(agentIds[0]))})` : ''}. If it was already open, start a ${bold('new session')} so it reloads skills.`);
+  console.log(`  ${hi('2.')} Ask: ${hi('"Do a security review of this project"')}.${via}`);
+  console.log(`  ${hi('3.')} Or invoke a skill by name, e.g. ${hi(`/${framework[0] ?? 'appsec-review'}`)}.`);
   console.log(dim('\nAI can make mistakes: review every finding and test every fix before you rely on it.'));
   if (!opts.global && agentIds.includes('claude') && agentIds.some((id) => id !== 'claude' && AGENTS[id].project === '.agents/skills')) {
     console.log(dim('Note: some agents read both .agents/skills and .claude/skills and may list these skills twice.'));

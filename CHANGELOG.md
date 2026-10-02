@@ -4,6 +4,16 @@ All notable changes to this project are documented here. The format is based on 
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-10-02
+
+### Added
+- Install progress bar that counts from 0 to 100% while the skills are copied, naming the skill and folder in progress. Shown on terminals only; piped output stays plain.
+- Install summary with the key values highlighted: skills installed, agents, locations, files copied, anything skipped, and time taken. Dry runs say that nothing was written.
+
+### Changed
+- Banner: the large "I" in CINDOVA now has top and bottom serifs so it no longer looks like a lowercase "l". The banner and accents are orange (red on terminals limited to 8/16 colors). `NO_COLOR` is respected.
+- Install paths in the output are now shown relative to the project (or `~/` for a global install) instead of relative to where the command was run.
+
 ## [1.5.0] - 2026-10-02
 
 ### Added

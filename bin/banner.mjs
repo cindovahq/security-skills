@@ -1,9 +1,12 @@
 // Terminal banner for the Cindova installer: CINDOVA in a large block font and
 // "SECURITY SKILLS" in a smaller one underneath. Pure functions; no I/O.
+// The big "I" has top and bottom serifs so it can't be mistaken for a lowercase "l".
+
+import { accentCodes } from './theme.mjs';
 
 const BIG = {
   C: [' ██████╗', '██╔════╝', '██║     ', '██║     ', '╚██████╗', ' ╚═════╝'],
-  I: ['██╗', '██║', '██║', '██║', '██║', '╚═╝'],
+  I: [' ██████╗', ' ╚═██╔═╝', '   ██║  ', '   ██║  ', ' ██████╗', ' ╚═════╝'],
   N: ['███╗   ██╗', '████╗  ██║', '██╔██╗ ██║', '██║╚██╗██║', '██║ ╚████║', '╚═╝  ╚═══╝'],
   D: ['██████╗ ', '██╔══██╗', '██║  ██║', '██║  ██║', '██████╔╝', '╚═════╝ '],
   O: [' ██████╗ ', '██╔═══██╗', '██║   ██║', '██║   ██║', '╚██████╔╝', ' ╚═════╝ '],
@@ -44,20 +47,21 @@ const wrap = (code, s) => `\x1b[${code}m${s}\x1b[0m`;
  * @param {{ version?: string, columns?: number, color?: boolean }} o
  * @returns {string} the banner, ready to print (no trailing newline)
  */
-export function banner({ version = '', columns = 80, color = false } = {}) {
+export function banner({ version = '', columns = 80, color = false, env = process.env } = {}) {
+  const { fill, shadow } = accentCodes(env);
   const tag = `Security skills for AI coding agents${version ? `  ·  v${version}` : ''}  ·  cindova.com`;
   const paint = (code, s) => (color ? wrap(code, s) : s);
   const wide = columns >= BANNER_WIDTH + 2;
 
   if (!wide) {
     // Narrow terminal: skip the art, keep the name.
-    return ['', paint('1;36', 'CINDOVA'), paint('1', 'Security Skills'), paint('2', tag), ''].join('\n');
+    return ['', paint(`1;${fill}`, 'CINDOVA'), paint('1', 'Security Skills'), paint('2', tag), ''].join('\n');
   }
 
   const big = BIG_LINES.map((line) => {
     if (!color) return line;
-    // Solid blocks bright, box-drawing shadow darker.
-    return [...line].map((ch) => (ch === '█' ? wrap('96', ch) : ch === ' ' ? ch : wrap('36', ch))).join('');
+    // Solid blocks in the accent color, box-drawing shadow in the darker shade.
+    return [...line].map((ch) => (ch === '█' ? wrap(`1;${fill}`, ch) : ch === ' ' ? ch : wrap(shadow, ch))).join('');
   });
   const small = SMALL_LINES.map((l) => paint('1;97', l));
   const lines = ['', ...big, '', ...small, '', paint('2', tag), ''];
