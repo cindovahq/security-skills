@@ -17,19 +17,32 @@ Cindova Security Skills use the open [Agent Skills](https://agentskills.io/speci
 
 Requires Node.js 18.17+. Nothing to install first: `npx` downloads the installer from GitHub and runs it.
 
+Run it with no command in a terminal for the **guided installer**. It shows the Cindova banner, then asks:
+
+1. **Where:** this project or all your projects (global).
+2. **Which agents or IDEs:** Claude Code, Kiro, GitHub Copilot, Cursor, Codex, Antigravity, Gemini CLI, Windsurf/Devin, Junie, OpenCode, Cline or any other agent. Agents already configured in the project (a `.claude/` or `.kiro/` folder, `CLAUDE.md`, `AGENTS.md`, `.cursor/`, ...) are pre-selected.
+3. **Which skills:** it detects your frameworks from the project files (`package.json`, `composer.json`, `requirements.txt`, `pom.xml`, `*.csproj`, `pubspec.yaml`, `wp-config.php`, ...), looks up to two folders deep for monorepos, and pre-selects `appsec-review` plus the matching framework skills. Change the selection with the arrow keys and space bar.
+4. **Confirm:** it shows exactly what will be installed where.
+
+Nothing is executed or sent anywhere: detection only reads manifest files. Ctrl+C cancels at any point without changing anything.
+
 ```bash
-npx github:cindovahq/security-skills install                       # interactive agent picker
+npx github:cindovahq/security-skills                                # guided installer
+npx github:cindovahq/security-skills install --yes                  # no prompts: detected agents and skills
+npx github:cindovahq/security-skills detect                         # show what it would detect
 npx github:cindovahq/security-skills install --agent claude,kiro,agents
 npx github:cindovahq/security-skills install --agent all --global
 npx github:cindovahq/security-skills install --agent copilot --skill laravel-security
 npx github:cindovahq/security-skills install --agent kiro --dir ../other-project
+npx github:cindovahq/security-skills install --agent claude --skill auto   # appsec-review + detected frameworks
 npx github:cindovahq/security-skills list                          # skills, agent ids and folders
 ```
 
 | Option | Meaning |
 |---|---|
 | `-a, --agent <ids>` | Comma-separated agent ids (see table below), or `all` (= `agents,claude,kiro,cline`) |
-| `-s, --skill <names>` | Comma-separated skill names (default: all skills) |
+| `-s, --skill <names>` | Comma-separated skill names, `auto` (`appsec-review` plus the frameworks detected in the project), or `all` (the default when `--agent` is given) |
+| `-y, --yes` | No prompts: use the agents already present in the project (or `agents,claude,kiro` if none) and `--skill auto` |
 | `-g, --global` | Install into your home directory instead of the project |
 | `-d, --dir <path>` | Project directory (default: current directory) |
 | `--dry-run` | Print what would happen without writing |

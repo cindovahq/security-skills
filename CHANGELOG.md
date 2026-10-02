@@ -4,7 +4,16 @@ All notable changes to this project are documented here. The format is based on 
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-10-02
+
+### Added
+- Guided installer: running `npx github:cindovahq/security-skills` in a terminal shows the Cindova Security Skills banner, then asks where to install (project or global), which agents or IDEs you use, and which skills, with a confirmation step. Arrow keys and space bar; Ctrl+C cancels without changes.
+- Framework detection: reads `package.json`, `composer.json`, Python requirements, `pom.xml`/Gradle files, `*.csproj`, `pubspec.yaml`, `wp-config.php`, plugin/theme headers and `supabase/` (up to two folders deep) and pre-selects `appsec-review` plus the matching framework skills.
+- Agent detection: pre-selects agents already configured in the project (`.claude/`, `.kiro/`, `.cursor/`, `AGENTS.md`, ...).
+- `detect` command, `--skill auto`, and `--yes` (no prompts: detected agents and skills).
+
 ### Changed
+- `--agent` with no `--skill` still installs every skill, so existing scripts behave as before. The `--yes` flag, previously accepted but unused, now means "use detected defaults".
 - `flutter-vulnerable` fixture: the placeholder Firebase API keys no longer match Google's API-key format, so GitHub secret scanning doesn't flag them. They still start with `AIzaSy` so reviewers recognize the public-by-design pattern.
 
 ## [1.4.0] - 2026-10-02

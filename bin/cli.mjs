@@ -1,21 +1,27 @@
 #!/usr/bin/env node
 // Cindova Security Skills installer. Zero dependencies; Node >= 18.
 //
+//   npx github:cindovahq/security-skills                  (guided: banner, agents, auto-detected skills)
+//   npx github:cindovahq/security-skills install --yes    (no prompts: detected agents and skills)
 //   npx github:cindovahq/security-skills install --agent claude,kiro,agents
 //   npx github:cindovahq/security-skills install --agent all --global
 //   npx github:cindovahq/security-skills agents-md
+//   npx github:cindovahq/security-skills detect
 //   npx github:cindovahq/security-skills list
 //   npx github:cindovahq/security-skills uninstall --agent kiro --global
 
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { basename, dirname, join, relative, resolve } from 'node:path';
-import { createInterface } from 'node:readline/promises';
 import { fileURLToPath } from 'node:url';
+import { banner } from './banner.mjs';
+import { STACKS, detectAgents, detectStack } from './detect.mjs';
+import { Cancelled, select } from './prompt.mjs';
 
 const PKG_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const SKILLS_SRC = join(PKG_ROOT, 'skills');
 const REPO_URL = 'https://github.com/cindovahq/security-skills';
+const VERSION = JSON.parse(readFileSync(join(PKG_ROOT, 'package.json'), 'utf8')).version;
 const AUTHOR = 'Cindova Technologies';
 const BLOCK_START = '<!-- cindova-security-skills:start -->';
 const BLOCK_END = '<!-- cindova-security-skills:end -->';
@@ -40,10 +46,15 @@ const AGENTS = {
   cline: { label: 'Cline', project: '.cline/skills', global: '~/.cline/skills' },
 };
 const ALL_DEFAULT = ['agents', 'claude', 'kiro', 'cline'];
+const DEFAULT_AGENTS = ['agents', 'claude', 'kiro']; // when nothing is detected and nothing is asked
+// Order and wording used by the guided installer's agent menu.
+const MENU = ['claude', 'kiro', 'copilot', 'cursor', 'codex', 'antigravity', 'antigravity-cli', 'gemini', 'windsurf', 'junie', 'opencode', 'cline', 'agents'];
+const MENU_LABEL = { agents: 'Any other agent (shared .agents/skills folder)' };
 
 // ---------- helpers ----------
 
-const color = (code) => (s) => (process.stdout.isTTY ? `\x1b[${code}m${s}\x1b[0m` : s);
+const useColor = () => Boolean(process.stdout.isTTY && !process.env.NO_COLOR);
+const color = (code) => (s) => (useColor() ? `\x1b[${code}m${s}\x1b[0m` : s);
 const bold = color('1');
 const dim = color('2');
 const green = color('32');
@@ -120,16 +131,111 @@ function targetDirs(agentIds, opts) {
   return dirs;
 }
 
-async function promptAgents() {
-  if (!process.stdin.isTTY) die('no --agent given. Example: --agent claude,kiro,agents (or --agent all)');
-  const ids = Object.keys(AGENTS);
-  console.log(bold('\nWhich agents do you use?'));
-  ids.forEach((id, i) => console.log(`  ${String(i + 1).padStart(2)}. ${id.padEnd(16)} ${dim(AGENTS[id].label)}`));
-  const rl = createInterface({ input: process.stdin, output: process.stdout });
-  const answer = await rl.question('\nNumbers or ids, comma-separated (Enter = agents,claude,kiro): ');
-  rl.close();
-  if (!answer.trim()) return ['agents', 'claude', 'kiro'];
-  return answer.split(',').map((x) => x.trim()).filter(Boolean).map((x) => (/^\d+$/.test(x) ? ids[Number(x) - 1] : x));
+const isTTY = () => Boolean(process.stdin.isTTY && process.stdout.isTTY);
+
+function showBanner() {
+  if (!process.stdout.isTTY) return;
+  console.log(banner({ version: VERSION, columns: process.stdout.columns ?? 80, color: useColor() }));
+}
+
+// "package.json (next)" -> "package.json: next"
+const ev = (e) => e.replace(/ \(([^)]*)\)$/, ': $1');
+
+const pretty = (p) => {
+  const home = homedir();
+  return p.startsWith(home) ? `~${p.slice(home.length)}` : p;
+};
+
+// Agents already used in the project (or in the home folder for a global install).
+function agentsFor(opts, global) {
+  return detectAgents(global ? homedir() : opts.dir);
+}
+
+// Expands --skill auto into skill names: appsec-review plus every detected framework skill.
+function expandAuto(opts, { announce = true } = {}) {
+  if (!opts.skill.includes('auto')) return opts.skill;
+  const rest = opts.skill.filter((n) => n !== 'auto');
+  if (opts.global) return ['all']; // nothing to detect in a global install
+  const detected = detectStack(opts.dir);
+  if (announce) {
+    if (detected.length) console.log(`${green('✓')} Detected ${detected.map((d) => `${bold(d.label)} ${dim(`(${ev(d.evidence[0])})`)}`).join(', ')}`);
+    else console.log(dim('No framework detected: installing appsec-review (generic checklists). Use --skill all for every skill.'));
+  }
+  return [...new Set([...rest, 'appsec-review', ...detected.map((d) => d.skill)])];
+}
+
+// The guided flow: where to install, which agents, which skills, then confirm.
+async function wizard(opts) {
+  let global = opts.global;
+  if (!global) {
+    const [scope] = await select({
+      title: 'Install for',
+      items: [
+        { value: 'project', label: 'This project', hint: pretty(opts.dir) },
+        { value: 'global', label: 'All my projects (global)', hint: 'your home folder' },
+      ],
+    });
+    global = scope === 'global';
+  }
+
+  const seen = agentsFor(opts, global);
+  const seenIds = new Set(seen.map((a) => a.id));
+  console.log(
+    seen.length
+      ? `${green('✓')} Found ${seen.map((a) => `${bold(a.label)} ${dim(`(${a.evidence})`)}`).join(', ')}`
+      : dim('No agent configuration found yet. Choose where you want the skills.')
+  );
+  const agentIds = await select({
+    title: 'Which agents or IDEs do you use?',
+    multi: true,
+    min: 1,
+    items: MENU.map((id) => ({
+      value: id,
+      label: MENU_LABEL[id] ?? AGENTS[id].label,
+      hint: global ? AGENTS[id].global : AGENTS[id].project,
+      checked: seenIds.has(id),
+    })),
+  });
+
+  const all = availableSkills();
+  const detected = global ? [] : detectStack(opts.dir);
+  const byName = new Map(detected.map((d) => [d.skill, d]));
+  if (!global) {
+    console.log(
+      detected.length
+        ? `${green('✓')} Detected ${detected.map((d) => `${bold(d.label)} ${dim(`(${ev(d.evidence[0])})`)}`).join(', ')}`
+        : dim('No framework detected in this folder. Pick the ones you need (appsec-review works for any stack).')
+    );
+  }
+  const rank = (name) => (name === 'appsec-review' ? 0 : byName.has(name) ? 1 : 2);
+  const names = [...all].sort((a, b) => rank(a.name) - rank(b.name) || a.name.localeCompare(b.name));
+  const picked = await select({
+    title: 'Which skills?',
+    multi: true,
+    min: 1,
+    items: names.map((sk) => {
+      const id = sk.name.replace(/-security$/, '');
+      return {
+        value: sk.name,
+        label: sk.name,
+        hint: sk.name === 'appsec-review' ? 'any stack, routes to the others (recommended)' : byName.has(sk.name) ? `detected: ${ev(byName.get(sk.name).evidence[0])}` : STACKS[id] ?? '',
+        checked: global || sk.name === 'appsec-review' || byName.has(sk.name),
+      };
+    }),
+  });
+
+  const dirs = targetDirs(agentIds, { ...opts, global });
+  console.log(`\n  ${bold('Skills')}  ${picked.length} of ${all.length}: ${picked.join(', ')}`);
+  console.log(`  ${bold('Into')}    ${[...dirs.keys()].map((d) => pretty(d)).join(', ')}\n`);
+  const [go] = await select({
+    title: 'Install?',
+    items: [
+      { value: 'yes', label: opts.dryRun ? 'Show what would be installed (dry run)' : 'Install' },
+      { value: 'no', label: 'Cancel' },
+    ],
+  });
+  if (go !== 'yes') throw new Cancelled();
+  return { agentIds, skills: selectSkills(picked), global };
 }
 
 function isOurs(skillDir) {
@@ -143,10 +249,25 @@ function isOurs(skillDir) {
 // ---------- commands ----------
 
 async function install(opts) {
-  const agentIds = resolveAgents(opts.agent.length ? opts.agent : await promptAgents());
-  const skills = selectSkills(opts.skill);
-  const dirs = targetDirs(agentIds, opts);
-  console.log(bold(`\nInstalling ${skills.length} skill(s) ${opts.global ? 'globally' : `into ${opts.dir}`}`));
+  showBanner();
+  let plan;
+  if (!opts.agent.length && !opts.yes && isTTY()) {
+    plan = await wizard(opts);
+  } else {
+    if (!opts.agent.length && !opts.yes) die('no --agent given. Example: --agent claude,kiro,agents (or --agent all). Run in a terminal for the guided installer, or add --yes to use detected agents.');
+    let ids = opts.agent;
+    if (!ids.length) {
+      const seen = agentsFor(opts, opts.global).map((a) => a.id);
+      ids = seen.length ? seen : DEFAULT_AGENTS;
+      console.log(dim(`Agents: ${ids.join(', ')}${seen.length ? ' (detected)' : ' (defaults; none detected)'}`));
+    }
+    const requested = !opts.skill.length && opts.yes ? { ...opts, skill: ['auto'] } : opts;
+    plan = { agentIds: resolveAgents(ids), skills: selectSkills(expandAuto(requested)), global: opts.global };
+  }
+
+  const { agentIds, skills, global } = plan;
+  const dirs = targetDirs(agentIds, { ...opts, global });
+  console.log(bold(`\nInstalling ${skills.length} skill(s) ${global ? 'globally' : `into ${pretty(opts.dir)}`}${opts.dryRun ? ' (dry run)' : ''}`));
   for (const [dir, ids] of dirs) {
     for (const skill of skills) {
       const dest = join(dir, skill.name);
@@ -162,7 +283,17 @@ async function install(opts) {
       console.log(`  ${green('✓')} ${skill.name} ${dim(`v${skill.version}`)} → ${displayPath(dest)} ${dim(`(${ids.join(', ')})`)}`);
     }
   }
-  console.log(`\nDone. Ask your agent for "a security review of this project", or invoke a skill by name (e.g. /laravel-security).`);
+  nextSteps(agentIds, skills, opts);
+}
+
+function nextSteps(agentIds, skills, opts) {
+  const framework = skills.filter((s) => s.name !== 'appsec-review').map((s) => s.name);
+  const via = framework.length ? ` It will use ${framework.slice(0, 3).join(', ')}${framework.length > 3 ? ' and more' : ''}.` : '';
+  console.log(`\n${bold('Next steps')}`);
+  console.log(`  1. Open this ${opts.global ? 'any project' : 'project'} in your agent${agentIds.length === 1 ? ` (${AGENTS[agentIds[0]].label})` : ''}. If it was already open, start a new session so it reloads skills.`);
+  console.log(`  2. Ask: ${bold('"Do a security review of this project"')}.${via}`);
+  console.log(`  3. Or invoke a skill by name, e.g. ${bold(`/${framework[0] ?? 'appsec-review'}`)}.`);
+  console.log(dim('\nAI can make mistakes: review every finding and test every fix before you rely on it.'));
   if (!opts.global && agentIds.includes('claude') && agentIds.some((id) => id !== 'claude' && AGENTS[id].project === '.agents/skills')) {
     console.log(dim('Note: some agents read both .agents/skills and .claude/skills and may list these skills twice.'));
   }
@@ -235,6 +366,18 @@ function agentsMd(opts) {
   console.log(`  ${green('✓')} updated ${displayPath(file)}`);
 }
 
+function detect(opts) {
+  showBanner();
+  const stack = detectStack(opts.dir);
+  const agents = detectAgents(opts.dir);
+  console.log(`${bold('Project')}  ${pretty(opts.dir)}`);
+  console.log(`${bold('Frameworks')}  ${stack.length ? '' : dim('none detected (appsec-review still applies)')}`);
+  for (const d of stack) console.log(`  ${green('✓')} ${d.label.padEnd(14)} ${dim(`${d.skill}: ${d.evidence.map(ev).join(', ')}`)}`);
+  console.log(`${bold('Agents')}  ${agents.length ? '' : dim('none detected')}`);
+  for (const a of agents) console.log(`  ${green('✓')} ${a.label.padEnd(30)} ${dim(a.evidence)}`);
+  console.log(`\nInstall with these defaults:\n  npx github:cindovahq/security-skills install --yes`);
+}
+
 function list() {
   console.log(bold('\nSkills'));
   for (const s of availableSkills()) console.log(`  ${s.name.padEnd(20)} ${dim(`v${s.version}`)}`);
@@ -251,20 +394,27 @@ function displayPath(p) {
 }
 
 function help() {
+  showBanner();
   console.log(`${bold('Cindova Security Skills')} — ${REPO_URL}
 
-Usage: npx github:cindovahq/security-skills <command> [options]
+Usage: npx github:cindovahq/security-skills [command] [options]
+
+Run it with no command in a terminal for the guided installer: it asks where to
+install and for which agents, detects your frameworks, and lets you confirm.
 
 Commands
   install       Copy skills into your agents' skill folders
   agents-md     Copy skills to .agents/skills and add a pointer block to AGENTS.md
                 (for agents without Agent Skills support, e.g. Zed, Aider)
   uninstall     Remove installed skills (and the AGENTS.md block)
+  detect        Show the frameworks and agents found in this folder
   list          Show available skills and supported agents
 
 Options
   -a, --agent <ids>   Comma-separated agent ids, or "all" (see "list")
-  -s, --skill <names> Comma-separated skill names (default: all)
+  -s, --skill <names> Comma-separated skill names, "auto" (appsec-review plus the
+                      frameworks detected in this folder) or "all" (default with --agent)
+  -y, --yes           No prompts: use detected agents and "--skill auto"
   -g, --global        Install for your user instead of the current project
   -d, --dir <path>    Project directory (default: current directory)
   -f, --file <path>   Instructions file for agents-md (default: AGENTS.md)
@@ -272,6 +422,8 @@ Options
   -h, --help          Show this help
 
 Examples
+  npx github:cindovahq/security-skills                       # guided
+  npx github:cindovahq/security-skills install --yes         # detected agents and skills, no prompts
   npx github:cindovahq/security-skills install --agent claude,kiro,agents
   npx github:cindovahq/security-skills install --agent all --global
   npx github:cindovahq/security-skills install --agent antigravity --skill laravel-security
@@ -281,7 +433,13 @@ Examples
 // ---------- main ----------
 
 const opts = parseArgs(process.argv.slice(2));
-const command = opts._[0] ?? 'help';
-const commands = { install, uninstall, 'agents-md': agentsMd, list, help };
+const command = opts._[0] ?? (isTTY() ? 'install' : 'help');
+const commands = { install, uninstall, 'agents-md': agentsMd, detect, list, help };
 if (!commands[command]) die(`unknown command "${command}". Run with --help.`);
-await commands[command](opts);
+try {
+  await commands[command](opts);
+} catch (err) {
+  if (!(err instanceof Cancelled)) throw err;
+  console.log('\nCancelled. Nothing was installed.');
+  process.exitCode = 130;
+}

@@ -55,8 +55,11 @@ Works per project (commit it so your whole team gets it) or globally (all your p
 No dependencies, just Node.js 18+:
 
 ```bash
-# Interactive: choose your agents
-npx github:cindovahq/security-skills install
+# Guided: banner, pick your agents/IDEs, frameworks auto-detected from your project
+npx github:cindovahq/security-skills
+
+# No prompts: agents already in the project + skills for the frameworks it detects
+npx github:cindovahq/security-skills install --yes
 
 # This project, for specific agents
 npx github:cindovahq/security-skills install --agent claude,kiro,agents
@@ -67,9 +70,12 @@ npx github:cindovahq/security-skills install --agent all --global
 # One skill, one agent
 npx github:cindovahq/security-skills install --agent antigravity --skill laravel-security
 
-# See agent ids and folders
+# See what it would detect, or the agent ids and folders
+npx github:cindovahq/security-skills detect
 npx github:cindovahq/security-skills list
 ```
+
+The guided installer asks where to install (this project or global), which agents or IDEs you use, and which skills. It reads `package.json`, `composer.json`, `requirements.txt`, `pom.xml`, `*.csproj`, `pubspec.yaml`, `wp-config.php` and similar files (up to two folders deep, so monorepos work) to pre-select the matching framework skills, and it pre-selects agents already configured in the project. It only reads files and never sends anything anywhere. Ctrl+C cancels without changes.
 
 The `agents` target writes to `.agents/skills`, the shared folder read by **Codex, GitHub Copilot, Cursor, Gemini CLI, Google Antigravity, Windsurf/Devin, JetBrains Junie and OpenCode**. `claude`, `kiro` and `cline` have their own folders. `--agent all` covers all of them.
 
