@@ -10,7 +10,7 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyFAKE00000000000000000000000000000',
+    apiKey: 'AIzaSy-FAKE-android-placeholder-key',
     appId: '1:123456789012:android:0000000000000000000000',
     messagingSenderId: '123456789012',
     projectId: 'acme-orders-demo',
@@ -18,7 +18,7 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyFAKE11111111111111111111111111111',
+    apiKey: 'AIzaSy-FAKE-ios-placeholder-key',
     appId: '1:123456789012:ios:1111111111111111111111',
     messagingSenderId: '123456789012',
     projectId: 'acme-orders-demo',

@@ -4,6 +4,9 @@ All notable changes to this project are documented here. The format is based on 
 
 ## [Unreleased]
 
+### Changed
+- `flutter-vulnerable` fixture: the placeholder Firebase API keys no longer match Google's API-key format, so GitHub secret scanning doesn't flag them. They still start with `AIzaSy` so reviewers recognize the public-by-design pattern.
+
 ## [1.4.0] - 2026-10-02
 
 ### Added
